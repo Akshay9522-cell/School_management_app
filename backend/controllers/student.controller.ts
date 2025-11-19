@@ -7,76 +7,128 @@ import {
   deleteStudentService,
 } from "../services/student.service";
 
+// ---------------- ADD STUDENT --------------------
 export const addStudent = async (req: Request, res: Response) => {
   try {
     const student = await addStudentService(req.body);
-    res.status(201).json({ success: true, message: "Student added successfully", student });
-  } catch (error) {
+    console.log(student)
+    return res.status(201).json({
+      success: true,
+      message: "Student added successfully",
+      data: student,
+    });
+  } catch (error: any) {
     console.error("Error adding student:", error);
-    res.status(400).json({ success: false, message: "Error adding student", error });
+
+    return res.status(400).json({
+      success: false,
+      message: error.message || "Failed to add student",
+    });
   }
 };
 
+// ---------------- GET ALL STUDENTS --------------------
 export const getStudents = async (req: Request, res: Response) => {
   try {
     const result = await getStudentsService(req.query);
-    res.status(200).json({
+
+    return res.status(200).json({
       success: true,
-      total: result.total,
-      currentPage: result.page,
-      totalPages: result.pages,
-      perPage: result.limit,
+      pagination: {
+        total: result.total,
+        currentPage: result.page,
+        totalPages: result.pages,
+        perPage: result.limit,
+      },
       sort: result.sort,
       filters: result.filtersUsed,
       data: result.students,
-      
     });
-    console.log(result)
-  } catch (error) {
+  } catch (error: any) {
     console.error("Error fetching students:", error);
-    res.status(500).json({ success: false, message: "Server error", error });
+
+    return res.status(500).json({
+      success: false,
+      message: "Failed to fetch students",
+    });
   }
 };
 
+// ---------------- GET STUDENT BY ID --------------------
 export const getStudentById = async (req: Request, res: Response) => {
   try {
     const student = await getStudentByIdService(req.params.id);
-    if (!student)
-      return res.status(404).json({ success: false, message: "Student not found" });
 
-    res.status(200).json({ success: true, data: student });
-  } catch (error) {
+    if (!student) {
+      return res.status(404).json({
+        success: false,
+        message: "Student not found",
+      });
+    }
+
+    return res.status(200).json({
+      success: true,
+      data: student,
+    });
+  } catch (error: any) {
     console.error("Error fetching student:", error);
-    res.status(500).json({ success: false, message: "Server error", error });
+
+    return res.status(500).json({
+      success: false,
+      message: "Failed to fetch student",
+    });
   }
 };
 
+// ---------------- UPDATE STUDENT --------------------
 export const updateStudent = async (req: Request, res: Response) => {
   try {
     const student = await updateStudentService(req.params.id, req.body);
-    if (!student)
-      return res.status(404).json({ success: false, message: "Student not found" });
 
-    res.status(200).json({
+    if (!student) {
+      return res.status(404).json({
+        success: false,
+        message: "Student not found",
+      });
+    }
+
+    return res.status(200).json({
       success: true,
       message: "Student updated successfully",
       data: student,
     });
-  } catch (error) {
+  } catch (error: any) {
     console.error("Error updating student:", error);
-    res.status(500).json({ success: false, message: "Server error", error });
+
+    return res.status(500).json({
+      success: false,
+      message: "Failed to update student",
+    });
   }
 };
 
+// ---------------- DELETE STUDENT --------------------
 export const deleteStudent = async (req: Request, res: Response) => {
   try {
     const student = await deleteStudentService(req.params.id);
-    if (!student)
-      return res.status(404).json({ success: false, message: "Student not found" });
 
-    res.status(200).json({ success: true, message: "Student deleted successfully" });
-  } catch (error) {
+    if (!student) {
+      return res.status(404).json({
+        success: false,
+        message: "Student not found",
+      });
+    }
+
+    return res.status(200).json({
+      success: true,
+      message: "Student deleted successfully",
+    });
+  } catch (error: any) {
     console.error("Error deleting student:", error);
-    res.status(500).json({ success: false, message: "Server error", error });
+
+    return res.status(500).json({
+      success: false,
+      message: "Failed to delete student",
+    });
   }
 };

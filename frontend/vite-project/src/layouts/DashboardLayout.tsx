@@ -1,17 +1,31 @@
-import React from "react";
+import { useState } from "react";
 import Sidebar from "./Sidebar";
 import Navbar from "./Navbar";
+import { Outlet } from "react-router-dom";
+import Dashboard from "../pages/Dashboard";
 
-type Props = { children: React.ReactNode };
+const DashboardLayout = () => {
+  const [isSidebarOpen, setIsSidebarOpen] = useState(true);
 
-const DashboardLayout: React.FC<Props> = ({ children }) => {
   return (
     <div className="flex h-screen bg-gray-100">
-      <Sidebar />
+
+      {/* SIDEBAR */}
+      <Sidebar isOpen={isSidebarOpen} />
+
+      {/* CONTENT AREA */}
       <div className="flex-1 flex flex-col">
-        <Navbar />
-        <main className="p-4 overflow-auto">{children}</main>
+
+        <Navbar onToggleSidebar={() => setIsSidebarOpen(!isSidebarOpen)} />
+      
+
+        <main className="p-4 overflow-auto">
+          {/* <Dashboard/> */}
+          <Outlet />
+        </main>
+
       </div>
+
     </div>
   );
 };

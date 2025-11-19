@@ -11,6 +11,7 @@
     export const addClass = async (req: Request, res: Response) => {
     try {
         const newClass = await addClassService(req.body);
+        console.log(newClass)
         res.status(201).json({
         success: true,
         message: "Class created successfully",

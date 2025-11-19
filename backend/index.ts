@@ -6,11 +6,15 @@ import connectDB from "./config/db";
 // import connectDB from "./config/db";
 
 import authRoutes from "./routes/auth";
-
+import feeTypeRoutes from "./routes/feeTypeRoute";
 import studentRoutes from "./routes/student.routes";
 import teacherRoutes from './routes/teacherRoutes'
 import classRoutes from './routes/classRoutes'
 import attendanceRoutes from './routes/attendanceRoutes'
+import feeStructureRoutes from './routes/feeStructureRoute'
+import feeGenerationRoutes from "./routes/feeGenerationRoutes";
+import feePaymentRoutes from "./routes/feePaymentRoutes";
+import feesService from './routes/feesRoutes'
 // import busRoutes from "./routes/buses";
 // import inventoryRoutes from "./routes/inventory";
 
@@ -33,11 +37,18 @@ const PORT = process.env.PORT || 4000;
 
 // Routes
 app.use('/api/auth',authRoutes)
+
+
 // app.use("/api/auth", authRoutes);
 app.use("/api/students", studentRoutes);
 app.use('/api/teachers',teacherRoutes)
 app.use('/api/classes',classRoutes)
 app.use('/api/attendance',attendanceRoutes)
+app.use("/api/fee-types", feeTypeRoutes);
+app.use("/api/fee-structure", feeStructureRoutes);
+app.use("/api/fees", feeGenerationRoutes);
+app.use("/api/fees", feePaymentRoutes);
+app.use("/api/feesservice", feesService);
 // app.use("/api/buses", busRoutes);
 // app.use("/api/inventory", inventoryRoutes);
 

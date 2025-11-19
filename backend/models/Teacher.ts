@@ -8,6 +8,7 @@ export interface ITeacher extends Document {
   qualification?: string;
   joiningDate?: Date;
   isActive: boolean;
+  classIds?: mongoose.Schema.Types.ObjectId[]; // <-- ADD THIS
 }
 
 const teacherSchema = new Schema<ITeacher>(
@@ -23,7 +24,7 @@ const teacherSchema = new Schema<ITeacher>(
       unique: true,
       lowercase: true,
       trim: true,
-      index: true, // helps faster search by email
+      index: true,
     },
     subject: {
       type: String,
@@ -43,6 +44,9 @@ const teacherSchema = new Schema<ITeacher>(
       type: Boolean,
       default: true,
     },
+
+    // ✅ FIX: Add classId
+   classIds: [{ type: mongoose.Schema.Types.ObjectId, ref: "Class",default:[]}],
   },
   { timestamps: true }
 );

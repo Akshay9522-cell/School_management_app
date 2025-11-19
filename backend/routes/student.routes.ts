@@ -22,3 +22,4 @@ router.put("/:id", auth, validate(updateStudentValidation), updateStudent);
 router.delete("/:id", auth, deleteStudent);
 
 export default router;
+  

@@ -1,3 +1,4 @@
+// services/student.service.ts
 import Student from "../models/Student";
 import Class from "../models/Class";
 
@@ -6,75 +7,131 @@ type Query = {
   limit?: any;
   search?: string;
   class?: string; // class name or id filter
-  sort?: string; // e.g. "name:asc" or "rollNo:desc"
+  section?: string;
+  sort?: string;
+  admissionNo?: string;
   minRoll?: any;
   maxRoll?: any;
 };
 
-// ✅ Create a student and link to Class
+// Create student and link to class (auto-roll number)
 export const addStudentService = async (data: any) => {
-  // Optional: validate classId if provided
-  if (data.classId) {
-    const classExists = await Class.findById(data.classId);
-    if (!classExists) throw new Error("Invalid classId provided");
-
-    // Create student
-    const student = await Student.create(data);
-
-    // Add this student to the class' students array
-    await Class.findByIdAndUpdate(data.classId, {
-      $addToSet: { students: student._id },
-    });
-
-    return student;
+  if (!data.classId) {
+    throw new Error("classId is required to assign a roll number");
   }
 
-  // If no classId — still allow standalone creation
-  return await Student.create(data);
+  // Validate class exists
+  const classExists = await Class.findById(data.classId);
+  if (!classExists) throw new Error("Invalid classId provided");
+
+  // Find the highest roll number in this class
+  const lastStudent = await Student.find({ classId: data.classId })
+    .sort({ rollNo: -1 })
+    .limit(1)
+    .lean();
+
+  const nextRollNo = lastStudent.length > 0 ? Number(lastStudent[0].rollNo) + 1 : 1;
+
+  // Assign the generated roll no (NUMBER)
+  data.rollNo = nextRollNo;
+
+  const student = await Student.create(data);
+
+  // Add student reference to class (idempotent)
+  await Class.findByIdAndUpdate(data.classId, {
+    $addToSet: { students: student._id },
+  });
+
+  return student;
 };
 
-// ✅ Get all students (with pagination, filters, sorting)
+// Get students with filters (className or classId, section, search, roll range)
 export const getStudentsService = async (query: Query) => {
-  const page = Math.max(1, parseInt(query.page) || 1);
-  const limit = Math.max(1, Math.min(100, parseInt(query.limit) || 10));
+  const page = Math.max(1, parseInt(String(query.page || "1"), 10));
+  const limit = Math.max(1, Math.min(200, parseInt(String(query.limit || "10"), 10)));
   const skip = (page - 1) * limit;
 
-  const search = query.search || "";
-  const classFilter = query.class || "";
-  const sortQuery = query.sort || "createdAt:desc";
-  const minRoll = query.minRoll !== undefined ? parseInt(query.minRoll) : undefined;
-  const maxRoll = query.maxRoll !== undefined ? parseInt(query.maxRoll) : undefined;
-
+  // Prepare filters
   const filters: any = {};
 
-  if (search) {
-    filters.$or = [
-      { name: { $regex: search, $options: "i" } },
-      { email: { $regex: search, $options: "i" } },
-    ];
+  // ---------- SEARCH ----------
+  if (query.search) {
+    const s = String(query.search).trim();
+    const isNumber = !isNaN(Number(s));
+
+    // If numeric search and no min/max specified, treat as exact rollNo search
+    const hasRange = (query.minRoll !== undefined) || (query.maxRoll !== undefined);
+
+    if (isNumber && !hasRange) {
+      filters.rollNo = Number(s);
+    } else {
+      filters.$or = [
+        { name: { $regex: s, $options: "i" } },
+        { email: { $regex: s, $options: "i" } },
+        { admissionNo: { $regex: s, $options: "i" } },
+      ];
+    }
   }
 
-  if (classFilter) {
-    filters.class = classFilter;
+  // ---------- CLASS & SECTION FILTER ----------
+  // We'll build a classIds array from class name/id and/or section and then apply $in
+  let classIds: any[] = [];
+
+  if (query.class) {
+    const c = String(query.class).trim();
+    if (/^[0-9a-fA-F]{24}$/.test(c)) {
+      classIds.push(c);
+    } else {
+      const classesByName = await Class.find({ name: { $regex: c, $options: "i" } }, "_id").lean();
+      classIds = classIds.concat(classesByName.map((x: any) => x._id));
+    }
   }
+
+  if (query.section) {
+    const section = String(query.section).trim();
+    const classesBySection = await Class.find({ section }, "_id").lean();
+    const sectionIds = classesBySection.map((x: any) => x._id);
+
+    // If we already have classIds (from name or id), intersect them with sectionIds
+    if (classIds.length > 0) {
+      classIds = classIds.filter((id) => sectionIds.some((sid) => String(sid) === String(id)));
+    } else {
+      classIds = sectionIds;
+    }
+  }
+
+  if (classIds.length > 0) {
+    filters.classId = { $in: classIds };
+  }
+
+  // ---------- ROLL RANGE ----------
+  const minRoll = query.minRoll !== undefined ? Number(query.minRoll) : undefined;
+  const maxRoll = query.maxRoll !== undefined ? Number(query.maxRoll) : undefined;
 
   if (minRoll !== undefined || maxRoll !== undefined) {
-    filters.rollNo = {};
-    if (minRoll !== undefined) filters.rollNo.$gte = minRoll;
-    if (maxRoll !== undefined) filters.rollNo.$lte = maxRoll;
+    // If filters.rollNo already set to a number (from numeric search), we replace it with range,
+    // because range request is more explicit.
+    const rollFilter: any = {};
+    if (minRoll !== undefined && !Number.isNaN(minRoll)) rollFilter.$gte = minRoll;
+    if (maxRoll !== undefined && !Number.isNaN(maxRoll)) rollFilter.$lte = maxRoll;
+    filters.rollNo = rollFilter;
   }
 
-  const ALLOWED_SORT_FIELDS = new Set(["name", "rollNo", "class", "createdAt"]);
+  // ---------- SORT ----------
+  const ALLOWED_SORT_FIELDS = new Set(["name", "rollNo", "admissionNo", "createdAt"]);
   let sort: any = { createdAt: -1 };
-  try {
-    const [field, order] = sortQuery.split(":");
-    if (ALLOWED_SORT_FIELDS.has(field)) {
-      sort = { [field]: order === "asc" ? 1 : -1 };
+  if (query.sort) {
+    try {
+      const [field, order] = String(query.sort).split(":");
+      if (ALLOWED_SORT_FIELDS.has(field)) {
+        sort = { [field]: order === "asc" ? 1 : -1 };
+      }
+    } catch {
+      sort = { createdAt: -1 };
     }
-  } catch {
-    sort = { createdAt: -1 };
   }
 
+  // ---------- QUERY + COUNT ----------
   const studentsPromise = Student.find(filters)
     .populate("classId", "name section")
     .skip(skip)
@@ -83,6 +140,7 @@ export const getStudentsService = async (query: Query) => {
     .lean();
 
   const countPromise = Student.countDocuments(filters);
+
   const [students, total] = await Promise.all([studentsPromise, countPromise]);
 
   return {
@@ -96,27 +154,32 @@ export const getStudentsService = async (query: Query) => {
   };
 };
 
-// ✅ Get Student by ID
 export const getStudentByIdService = async (id: string) => {
-  return await Student.findById(id).populate("classId", "name section");
+  return await Student.findById(id).populate("classId", "name section").lean();
 };
 
-// ✅ Update Student
 export const updateStudentService = async (id: string, data: any) => {
-  const updatedStudent = await Student.findByIdAndUpdate(id, data, { new: true });
+  // Fetch previous student to compare classId
+  const prev = await Student.findById(id).lean();
 
-  // Update class references if classId changed
-  if (data.classId && updatedStudent) {
+  const updatedStudent = await Student.findByIdAndUpdate(id, data, {
+    new: true,
+    runValidators: true,
+  }).lean();
+
+  // If classId changed, update Class documents
+  if (prev && data.classId && String(prev.classId) !== String(data.classId)) {
+    // remove from any class that still contains this student id (safe cleanup)
     await Class.updateMany({ students: id }, { $pull: { students: id } });
+    // add to new class
     await Class.findByIdAndUpdate(data.classId, { $addToSet: { students: id } });
   }
 
   return updatedStudent;
 };
 
-// ✅ Delete Student
 export const deleteStudentService = async (id: string) => {
-  const student = await Student.findByIdAndDelete(id);
+  const student = await Student.findByIdAndDelete(id).lean();
   if (student?.classId) {
     await Class.findByIdAndUpdate(student.classId, { $pull: { students: id } });
   }

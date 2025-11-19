@@ -1,47 +1,43 @@
+// validations/student.validation.ts
 import Joi from "joi";
 
 export const createStudentValidation = Joi.object({
-  body: Joi.object({
-    name: Joi.string().min(2).max(100).required().messages({
-      "string.empty": "Name is required",
-      "string.min": "Name must have at least 2 characters",
-    }),
-    rollNo: Joi.number().integer().min(1).required().messages({
-      "number.base": "Roll number must be a valid number",
-      "any.required": "Roll number is required",
-    }),
-    class: Joi.string().required().messages({
-      "string.empty": "Class ID is required",
-    }),
-    section: Joi.string().allow("", null), // optional field
-    age: Joi.number().min(3).max(100).optional(),
-    gender: Joi.string().valid("Male", "Female", "Other").optional(),
-    parentName: Joi.string().optional(),
-    address: Joi.string().optional(),
-    contactNumber: Joi.string()
-      .pattern(/^[0-9]{10}$/)
-      .optional()
-      .messages({
-        "string.pattern.base": "Contact number must be 10 digits",
-      }),
-  }),
+  name: Joi.string().min(2).max(100).required(),
+  email: Joi.string().email().required(),
+  phone: Joi.string().pattern(/^[0-9]{10}$/).required(),
+  
+  rollNo: Joi.number().optional(),
+  address: Joi.string().required(),
+  parentName: Joi.string().required(),
+  parentPhone: Joi.string().pattern(/^[0-9]{10}$/).required(),
+  admissionNo: Joi.string().required(),
+  dob: Joi.date().required(),
+  gender: Joi.string().valid("Male", "Female", "Other").required(),
+  classId: Joi.string().optional().allow("", null),
+  profileImage: Joi.string().optional().allow(""),
 });
 
 export const updateStudentValidation = Joi.object({
   body: Joi.object({
     name: Joi.string().min(2).max(100).optional(),
-    rollNo: Joi.number().integer().min(1).optional(),
-    class: Joi.string().optional(),
-    section: Joi.string().allow("", null),
-    age: Joi.number().min(3).max(100).optional(),
-    gender: Joi.string().valid("Male", "Female", "Other").optional(),
-    parentName: Joi.string().optional(),
-    address: Joi.string().optional(),
-    contactNumber: Joi.string()
+    email: Joi.string().email().optional(),
+    phone: Joi.string()
       .pattern(/^[0-9]{10}$/)
       .optional()
-      .messages({
-        "string.pattern.base": "Contact number must be 10 digits",
-      }),
+      .messages({ "string.pattern.base": "Phone must be 10 digits" }),
+   
+    rollNo: Joi.number().optional(),
+    address: Joi.string().optional(),
+    parentName: Joi.string().optional(),
+    parentPhone: Joi.string()
+      .pattern(/^[0-9]{10}$/)
+      .optional()
+      .messages({ "string.pattern.base": "Parent phone must be 10 digits" }),
+    admissionNo: Joi.string().optional(),
+    dob: Joi.date().optional(),
+    gender: Joi.string().valid("Male", "Female", "Other").optional(),
+    classId: Joi.string().optional().allow("", null),
+    profileImage: Joi.string().optional().allow(""),
+    status: Joi.string().valid("Active", "Inactive").optional(),
   }),
 });

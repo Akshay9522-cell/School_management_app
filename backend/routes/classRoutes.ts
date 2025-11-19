@@ -15,7 +15,7 @@ import {
 const router = Router();
 
 // ✅ Create a class
-router.post("/", validate(createClassValidation), addClass);
+router.post("/create", validate(createClassValidation), addClass);
 
 // ✅ Get all classes
 router.get("/all", getClasses);
