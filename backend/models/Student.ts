@@ -40,6 +40,6 @@ const studentSchema = new Schema<IStudent>(
 );
 
 // Composite unique index if you want rollNo to be unique within a class+section:
-// studentSchema.index({ classId: 1, rollNo: 1 }, { unique: true });
+studentSchema.index({ classId: 1, rollNo: 1 }, { unique: true,  sparse: true });
 
 export default model<IStudent>("Student", studentSchema);
