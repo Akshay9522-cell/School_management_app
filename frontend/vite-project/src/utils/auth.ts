@@ -9,5 +9,6 @@ export const setToken = (token: string) => {
 };
 
 export const getToken = () => Cookies.get("token") || null;
+export const getRole = () => Cookies.get("role") || null;
 
 export const logout = () => Cookies.remove("token");

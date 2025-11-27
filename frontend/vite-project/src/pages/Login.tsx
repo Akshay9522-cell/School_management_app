@@ -1,6 +1,7 @@
 import React, { useState,useEffect } from "react";
 import { loginAdmin } from "../api/auth";
 import { setToken } from "../utils/auth";
+import Cookies from "js-cookie";
 import { useNavigate } from "react-router-dom";
 import { Eye, EyeOff } from "lucide-react"; // for icons
 import toast from "react-hot-toast";
@@ -30,12 +31,27 @@ const Login: React.FC = () => {
       const res = await loginAdmin(email, password);
 
       // Save Token to Cookies
-      setToken(res.token);
+    // Save token
+    setToken(res.token);
 
-      toast.success("Login successful!");
+    Cookies.set("teacherId", res.user._id, {
+    expires: 7,
+    sameSite: "strict",
+  });
 
-      // Navigate to dashboard
+    // Save role separately
+    Cookies.set("role", res.user.role, {
+      expires: 7,
+      sameSite: "strict",
+    });
+    
+    // Navigate based on role
+    if (res.user.role === "admin") {
       navigate("/dashboard");
+    } else if (res.user.role === "teacher") {
+      navigate("/dashboard"); // same layout, menus hidden
+    }
+
     } catch (err: any) {
       toast.error(err?.response?.data?.message || "Invalid credentials");
     }

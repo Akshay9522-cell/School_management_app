@@ -14,8 +14,13 @@ import ClassList from "./pages/Classes/ClassList";
 import AddClass from "./pages/Classes/AddClass";
 import StudentList from "./pages/students/StudentList";
 import AddStudent from "./pages/students/AddStudent";
-import AttendanceList from "./pages/Attandance/AttandanceList";
-import AddAttendance from "./pages/Attandance/AddAttandance";
+
+
+import ItemsPage from "./pages/Inventory/ItemPage";
+import StockPage from "./pages/Inventory/StockPage";
+import PaymentPage from "./pages/Inventory/PaymentPage";
+import GenerateQRCodePage from "./pages/GenerateQRCodePage";
+import QRScannerPage from "./pages/QRScannerPage";
 
 
 function App() {
@@ -45,8 +50,15 @@ function App() {
   <Route path="students" element={<StudentList/>}/>
   <Route path="students/add" element={<AddStudent/>}/>
   // edit page is remaining
-  <Route path="attendance" element={<AttendanceList/>}/>
-  <Route path='attendance/add' element={<AddAttendance/>}/>
+ 
+  <Route path="qrcode-scanner" element={<QRScannerPage/>}/>
+  <Route path="item" element={<ItemsPage/>}/>
+  <Route path="stock" element={<StockPage/>}/>
+  <Route path="payment" element={<PaymentPage/>}/>
+  <Route path="qrcodepage" element={<GenerateQRCodePage/>}/>
+  
+
+
 
 
 

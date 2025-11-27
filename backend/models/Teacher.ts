@@ -1,6 +1,7 @@
 import mongoose, { Schema, Document } from "mongoose";
 
 export interface ITeacher extends Document {
+  userId:mongoose.Types.ObjectId
   name: string;
   email: string;
   subject: string;
@@ -9,10 +10,19 @@ export interface ITeacher extends Document {
   joiningDate?: Date;
   isActive: boolean;
   classIds?: mongoose.Schema.Types.ObjectId[]; // <-- ADD THIS
+  classrooms:string[]
 }
 
 const teacherSchema = new Schema<ITeacher>(
   {
+
+    userId:{
+      type:mongoose.Schema.Types.ObjectId,
+      ref:"User",
+      required:true,
+     
+
+    },
     name: {
       type: String,
       required: [true, "Teacher name is required"],
@@ -21,10 +31,9 @@ const teacherSchema = new Schema<ITeacher>(
     email: {
       type: String,
       required: [true, "Email is required"],
-      unique: true,
       lowercase: true,
       trim: true,
-      index: true,
+    
     },
     subject: {
       type: String,
@@ -47,7 +56,9 @@ const teacherSchema = new Schema<ITeacher>(
 
     // ✅ FIX: Add classId
    classIds: [{ type: mongoose.Schema.Types.ObjectId, ref: "Class",default:[]}],
+     classrooms: [{ type: Schema.Types.ObjectId, ref: "Classroom" }],
   },
+  
   { timestamps: true }
 );
 

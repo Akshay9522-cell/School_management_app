@@ -1,3 +1,6 @@
+
+import User from '../models/User'
+import Teacher from '../models/Teacher';
 import { Request, Response } from "express";
 import {
   addTeacherService,
@@ -9,20 +12,70 @@ import {
   assignClassService,
 } from "../services/teacherService";
 import { getClassByIdService } from "../services/classService";
+import bcrypt from 'bcryptjs';
 
 // Add Teacher
 export const addTeacher = async (req: Request, res: Response) => {
   try {
-    const teacher = await addTeacherService(req.body);
+    const { name, email, subject, phone, qualification, classIds } = req.body;
+
+    // 1️⃣ Check if user already exists
+    let user = await User.findOne({ email });
+
+    if (!user) {
+      // Create user with DEFAULT PASSWORD
+      const hashed = await bcrypt.hash("teacher123", 10);
+
+      user = await User.create({
+        name,
+        email,
+        password: hashed,
+        role: "teacher",
+      });
+    } else {
+      // Ensure user role becomes teacher
+      user.role = "teacher";
+  user.password = await bcrypt.hash("teacher123", 10); // 🔥 FIX
+  await user.save();
+    }
+
+    // 2️⃣ Check if teacher profile exists
+    let teacher = await Teacher.findOne({ userId: user._id });
+
+    if (!teacher) {
+      teacher = await Teacher.create({
+        userId: user._id,
+        name,
+        email,
+        subject,
+        phone,
+        qualification,
+        classIds,
+      });
+    } else {
+      teacher.name = name;
+      teacher.email = email;
+      teacher.subject = subject;
+      teacher.phone = phone;
+      teacher.qualification = qualification;
+      teacher.classIds = classIds || teacher.classIds;
+      await teacher.save();
+    }
+
     res.status(201).json({
       success: true,
-      message: "Teacher added successfully",
-      data: teacher,
+      message: "Teacher created/updated successfully. Default password = teacher123",
+      data: { user, teacher },
     });
+
   } catch (error: any) {
     res.status(500).json({ success: false, message: error.message });
   }
 };
+
+
+
+
 
 // Get Teachers
 export const getTeachers = async (req: Request, res: Response) => {
