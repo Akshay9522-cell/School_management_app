@@ -3,7 +3,7 @@ import { useNavigate } from "react-router-dom";
 
 import { getClasses } from "../../api/classApi";
 import { getStudents, type IStudent } from "../../api/studentApi";   // <-- IMPORTED
-import { bulkAttendance, type IBulkAttendance, type AttendanceStatus } from "../../api/attandanceApi";
+import { bulkAttendance, type IBulkAttendance, type AttendanceStatus } from "../../api/attendanceApi";
 
 interface IClass {
   _id: string;

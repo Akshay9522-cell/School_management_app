@@ -62,6 +62,7 @@ const TeacherList = () => {
         classIds: classFilter.length ? classFilter : undefined, // only send if selected
       });
       setTeachers(res.data?.data || []);
+      console.log(res.data?.data)
       setTotalPages(res.data?.pagination?.pages);
     } catch (err) {
       console.error("Failed to load teachers", err);

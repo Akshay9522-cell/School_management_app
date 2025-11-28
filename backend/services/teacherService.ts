@@ -7,20 +7,16 @@ type TeacherQuery = {
   search?: string;
   subject?: string;
   classIds?:string[];
-  sort?: string; // e.g. "name:asc" or "joiningDate:desc"
+  sort?: string; 
+  all?:string | boolean // e.g. "name:asc" or "joiningDate:desc"
+ 
 };
 
 // Add teacher
-export const addTeacherService = async (data: any) => {
-  return await Teacher.create(data);
-};
 
-// Get teachers with filters, pagination, and sorting
+
+
 export const getTeachersService = async (query: TeacherQuery) => {
-  const page = Number(query.page) || 1;
-  const limit = Number(query.limit) || 10;
-  const skip = (page - 1) * limit;
-
   const filters: any = {};
 
   if (query.search) {
@@ -31,30 +27,84 @@ export const getTeachersService = async (query: TeacherQuery) => {
     filters.subject = { $regex: query.subject, $options: "i" };
   }
 
-  // FIX: multiple class filter
-if (query.classIds && query.classIds.length > 0) {
-  filters.classIds = { 
-    $in: query.classIds.map(id => new mongoose.Types.ObjectId(id))
-  };
-} 
-  const teachers = await Teacher.find(filters)
-    .populate("classIds")
-    .skip(skip)
-    .limit(limit);
+  if (query.classIds && query.classIds.length > 0) {
+    filters.classIds = { 
+      $in: query.classIds.map(id => new mongoose.Types.ObjectId(id))
+    };
+  }
 
-  const total = await Teacher.countDocuments(filters);
+  let teachersQuery = Teacher.find(filters).populate("classIds");
+
+  // If all=true, skip pagination
+  let page = 1, limit = 10, total = 0;
+  if (query.all !== "true") {
+    page = Number(query.page) || 1;
+    limit = Number(query.limit) || 10;
+    const skip = (page - 1) * limit;
+    teachersQuery = teachersQuery.skip(skip).limit(limit);
+  }
+
+  const teachers = await teachersQuery;
+  total = await Teacher.countDocuments(filters);
 
   return {
     success: true,
-    data:teachers,
-   pagination: {
-    total,
-    page,
-    limit,
-    pages: Math.ceil(total / limit), // total pages
-  },
+    data: teachers,
+    pagination: query.all === "true" ? undefined : {
+      total,
+      page,
+      limit,
+      pages: Math.ceil(total / limit),
+    },
   };
 };
+
+// export const addTeacherService = async (data: any) => {
+//   return await Teacher.create(data);
+// };
+
+// // Get teachers with filters, pagination, and sorting
+// export const getTeachersService = async (query: TeacherQuery) => {
+
+ 
+//   const page = Number(query.page) || 1;
+//   const limit = Number(query.limit) || 10;
+//   const skip = (page - 1) * limit;
+
+//   const filters: any = {};
+
+//   if (query.search) {
+//     filters.name = { $regex: query.search, $options: "i" };
+//   }
+
+//   if (query.subject) {
+//     filters.subject = { $regex: query.subject, $options: "i" };
+//   }
+
+//   // FIX: multiple class filter
+// if (query.classIds && query.classIds.length > 0) {
+//   filters.classIds = { 
+//     $in: query.classIds.map(id => new mongoose.Types.ObjectId(id))
+//   };
+// } 
+//   const teachers = await Teacher.find(filters)
+//     .populate("classIds")
+//     .skip(skip)
+//     .limit(limit);
+
+//   const total = await Teacher.countDocuments(filters);
+
+//   return {
+//     success: true,
+//     data:teachers,
+//    pagination: {
+//     total,
+//     page,
+//     limit,
+//     pages: Math.ceil(total / limit), // total pages
+//   },
+//   };
+// };
 
 
 export const assignClassToTeacher = async (teacherId: string, classId: string[]) => {

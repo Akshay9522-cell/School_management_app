@@ -1,9 +1,8 @@
-// models/TeacherAttendance.ts
 import { Schema, model, Document, Types } from "mongoose";
 
 export interface ITeacherAttendance extends Document {
-  teacherId: Types.ObjectId;
-  classroomId: Types.ObjectId;
+  teacherId: Types.ObjectId | any;
+  classroomId: Types.ObjectId | any;
   date: string; // YYYY-MM-DD
   checkInTime?: Date;
   checkOutTime?: Date;
@@ -11,6 +10,7 @@ export interface ITeacherAttendance extends Document {
   checkOutLocation?: { lat: number; lng: number };
   status?: "PRESENT" | "LATE" | "ABSENT";
   createdBy?: Types.ObjectId;
+  totalHours?: string;
 }
 
 const TeacherAttendanceSchema = new Schema<ITeacherAttendance>(
@@ -24,11 +24,11 @@ const TeacherAttendanceSchema = new Schema<ITeacherAttendance>(
     checkOutLocation: { lat: Number, lng: Number },
     status: { type: String, enum: ["PRESENT", "LATE", "ABSENT"], default: "PRESENT" },
     createdBy: { type: Schema.Types.ObjectId, ref: "User" },
+    totalHours: { type: String },
   },
   { timestamps: true }
 );
 
-// Ensure one attendance record per teacher per date
 TeacherAttendanceSchema.index({ teacherId: 1, date: 1 }, { unique: true });
 
 export default model<ITeacherAttendance>("TeacherAttendance", TeacherAttendanceSchema);

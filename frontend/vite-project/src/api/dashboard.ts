@@ -20,7 +20,7 @@ api.interceptors.request.use((config) => {
 
 // APIS
 export const getStudentCount = () => api.get("students/all");
-export const getTeacherCount = () => api.get("teachers/all");
+export const getTeacherCount = () => api.get("teachers");
 export const getClassCount = () => api.get("classes/all");
 export const getTodayAttendanceCount = () => api.get("attendance/all");
 

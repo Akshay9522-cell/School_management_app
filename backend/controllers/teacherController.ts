@@ -3,7 +3,7 @@ import User from '../models/User'
 import Teacher from '../models/Teacher';
 import { Request, Response } from "express";
 import {
-  addTeacherService,
+ 
   getTeachersService,
   getTeacherByIdService,
   updateTeacherService,
@@ -74,22 +74,66 @@ export const addTeacher = async (req: Request, res: Response) => {
 };
 
 
+export const getUsersByRole = async (req: Request, res: Response) => {
+  try {
+    const role = (req.query.role as string)?.trim();  
+   
+    // Validate
+    if (!role) {
+      return res.status(400).json({
+        success: false,
+        message: "Role is required in query parameter",
+      });
+    }
+
+    // Fetch from DB
+    const users = await User.find({ role });
+
+    res.status(200).json({
+      success: true,
+      count: users.length,
+      data: users,
+    });
+  } catch (error) {
+    console.error("Error fetching users:", error);
+
+    res.status(500).json({
+      success: false,
+      message: "Server error while fetching users",
+    });
+  }
+};
 
 
 
 // Get Teachers
 export const getTeachers = async (req: Request, res: Response) => {
   try {
-    const result = await getTeachersService(req.query);
-   res.status(200).json({
+    // If request asks for all teachers
+      
+    // if (req.query.all === "true") {
+    //   const teachers = await getTeachersService({ all: true });
+
+    //   return res.status(200).json({
+    //     success: true,
+    //     data: teachers.data, // assuming service returns { data, pagination? }
+    //   });
+    // }
+
+    // Paginated request
+    const result = await getTeachersService(req.query as any);
+
+    res.status(200).json({
       success: true,
       data: result.data,
-      pagination: {
-        page: result.pagination.page,                // page from result
-        limit: result.pagination.limit,              // limit from result
-        total: result.pagination.total,              // total from result
-        pages: Math.ceil(result.pagination.total / result.pagination.limit), // calculate total pages
-      },
+      pagination: result.pagination
+        ? {
+            page: result.pagination.page,
+            limit: result.pagination.limit,
+            total: result.pagination.total,
+            pages: result.pagination.pages,
+          }
+        : undefined,
     });
   } catch (error: any) {
     res.status(500).json({ success: false, message: error.message });

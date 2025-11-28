@@ -2,20 +2,33 @@ import React, { useState, useEffect } from "react";
 import { getTeachers, updateTeacherSubject } from "../../api/teacherApi";
 import { useNavigate } from "react-router-dom";
 
+
+
 const AssignSubject = () => {
   const navigate = useNavigate();
 
-  const [teachers, setTeachers] = useState([]);
+  const [teachers, setTeachers] = useState<Teacher[]>([]);
   const [selectedTeacher, setSelectedTeacher] = useState("");
   const [subject, setSubject] = useState("");
 
   useEffect(() => {
     loadTeachers();
   }, []);
+  type Teacher = {
+  name: string;
+  email: string;
+  _id:string
+  // other fields
+};
+
+
+
 
   const loadTeachers = async () => {
-    const res = await getTeachers({});
+    const res = await getTeachers({all:"true"} as any);
+    const teachers: Teacher[] = res.data.data;
     setTeachers(res.data.data);
+    console.log(res.data.data)
   };
 
   const handleSubmit = async (e:any) => {
@@ -54,8 +67,8 @@ const AssignSubject = () => {
           >
             <option value="">Select Teacher</option>
             {teachers.map((t) => (
-              <option key={t._id} value={t._id}>
-                {t.name} — {t.email}
+              <option key={t._id } value={t._id}>
+                {t.name } — {t.email}
               </option>
             ))}
           </select>

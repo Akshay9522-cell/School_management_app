@@ -3,13 +3,38 @@ import AttendanceService from "../services/attendance.Service";
 import Classroom, { IClassroom } from "../models/classroom";
 import Teacher, { ITeacher } from "../models/Teacher";
 import { verifyLocationRadius } from "../utils/location";
+import mongoose from "mongoose";
 
-// ----------------------------
-// QR CHECK-IN
-// ----------------------------
+/**
+ * QR check-in controller
+ */
 export const checkInWithQR = async (req: Request, res: Response) => {
   try {
-    const { classroomCode, teacherId, lat, lng } = req.body;
+    // prefer teacherId from token (req.user) if available, fallback to body
+    const teacherFromToken = (req as any).user;
+   
+
+      console.log("Teacher ID from token:", (req as any).user?.id);
+    console.log("Teacher ID from body:", req.body.teacherId)
+    const { classroomCode, teacherId: teacherIdFromBody, lat, lng } = req.body;
+   
+
+  const teacherId = teacherFromToken?.role === "teacher" 
+  ? teacherFromToken.id 
+  : teacherIdFromBody;
+
+  
+console.log("Teacher ID from token:", teacherFromToken?.id);
+console.log("Teacher ID from body:", teacherIdFromBody);
+// console.log("Testing DB...");
+// console.log("All teachers:", await Teacher.find({}, { name: 1 }));
+// console.log("Direct findById:", await Teacher.findById("691b3a35eacdf1d099d038cb"));
+// console.log("findOne with ObjectId:", await Teacher.findOne({ _id: new mongoose.Types.ObjectId("691b3a35eacdf1d099d038cb") }));
+
+
+    // console.log("Find teacher by ID:", await Teacher.findById("691b3a35eacdf1d099d038cb"));
+//console.log("All teachers:", await Teacher.find({}, "_id name"));
+
 
     if (!classroomCode || !teacherId) {
       return res.status(400).json({ success: false, message: "classroomCode & teacherId required" });
@@ -21,34 +46,18 @@ export const checkInWithQR = async (req: Request, res: Response) => {
     }
 
     const teacher = await Teacher.findById(teacherId) as ITeacher | null;
+  
     if (!teacher) {
       return res.status(404).json({ success: false, message: "Teacher not found" });
     }
 
-    console.log("Teacher classIds:", teacher.classIds);
-    console.log("Classroom _id:", classroom._id.toString());
-
-    // -----------------------------
-    // 3) Check class assignment
-    // -----------------------------
+    // 3) Check class assignment - do NOT mutate teacher record here
     const isAssigned = teacher.classIds?.some(id => id.toString() === classroom._id.toString());
-    console.log(isAssigned)
-
     if (!isAssigned) {
-      console.warn(`Teacher not assigned to classroom. Adding temporarily for testing...`);
-      // --- TEMP FIX FOR TESTING ---
-    
-    
-    
-      teacher.classIds = teacher.classIds || [];
-  teacher.classIds.push(classroom._id as any);
-  await teacher.save();  // await Teacher.findByIdAndUpdate(teacherId, { $addToSet: { classIds: classroom._id } });
       return res.status(403).json({ success: false, message: "You are not assigned to this classroom" });
     }
 
-    // -----------------------------
-    // 4) Verify location radius
-    // -----------------------------
+    // 4) Verify location radius (if classroom has a location)
     if (classroom.location) {
       const inside = verifyLocationRadius(lat, lng, classroom.location.lat, classroom.location.lng, 30);
       if (!inside) {
@@ -56,15 +65,13 @@ export const checkInWithQR = async (req: Request, res: Response) => {
       }
     }
 
-    // -----------------------------
-    // 5) Mark check-in
-    // -----------------------------
+    // 5) Mark check-in via service
     const attendance = await AttendanceService.checkIn({
       teacherId,
       classroomCode: classroom.code,
       lat,
       lng,
-      performedBy: teacherId
+      performedBy: (req as any).user?.id || teacherId
     });
 
     return res.status(201).json({
@@ -74,17 +81,20 @@ export const checkInWithQR = async (req: Request, res: Response) => {
     });
 
   } catch (err: any) {
-    return res.status(400).json({ success: false, message: err.message });
+    console.error("checkInWithQR error:", err);
+    return res.status(400).json({ success: false, message: err.message || "Check-in failed" });
   }
 };
 
-// ----------------------------
-// QR CHECK-OUT
-// ----------------------------
+/**
+ * QR check-out controller
+ */
 export const checkOutWithQR = async (req: Request, res: Response) => {
   try {
-    const { classroomCode, teacherId, lat, lng } = req.body;
+    const teacherIdFromToken = (req as any).user?.id;
+    const { classroomCode, teacherId: teacherIdFromBody, lat, lng } = req.body;
 
+    const teacherId = teacherIdFromToken || teacherIdFromBody;
     if (!classroomCode || !teacherId) {
       return res.status(400).json({ success: false, message: "classroomCode & teacherId required" });
     }
@@ -99,15 +109,8 @@ export const checkOutWithQR = async (req: Request, res: Response) => {
       return res.status(404).json({ success: false, message: "Teacher not found" });
     }
 
-    console.log("Teacher classIds:", teacher.classIds);
-    console.log("Classroom _id:", classroom._id.toString());
-
     const isAssigned = teacher.classIds?.some(id => id.toString() === classroom._id.toString());
-
     if (!isAssigned) {
-      console.warn(`Teacher not assigned to classroom. Adding temporarily for testing...`);
-      // --- TEMP FIX FOR TESTING ---
-      // await Teacher.findByIdAndUpdate(teacherId, { $addToSet: { classIds: classroom._id } });
       return res.status(403).json({ success: false, message: "You are not assigned to this classroom" });
     }
 
@@ -123,7 +126,7 @@ export const checkOutWithQR = async (req: Request, res: Response) => {
       classroomCode: classroom.code,
       lat,
       lng,
-      performedBy: teacherId
+      performedBy: (req as any).user?.id || teacherId
     });
 
     return res.status(200).json({
@@ -133,6 +136,7 @@ export const checkOutWithQR = async (req: Request, res: Response) => {
     });
 
   } catch (err: any) {
-    return res.status(400).json({ success: false, message: err.message });
+    console.error("checkOutWithQR error:", err);
+    return res.status(400).json({ success: false, message: err.message || "Check-out failed" });
   }
 };

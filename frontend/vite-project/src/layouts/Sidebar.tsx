@@ -6,8 +6,8 @@ import Cookies from "js-cookie";
 
 const Sidebar = ({ isOpen }: { isOpen: boolean }) => {
   const [openInventory, setOpenInventory] = useState(false);
+  const [openTeacher, setOpenTeacher] = useState(false);
 
-  // Read role from cookie (admin / teacher)
   const role = Cookies.get("role");
 
   return (
@@ -20,7 +20,7 @@ const Sidebar = ({ isOpen }: { isOpen: boolean }) => {
 
       <nav className="flex flex-col space-y-1">
 
-        {/* HOME — Visible to both */}
+        {/* HOME */}
         <NavLink
           to="/dashboard"
           className={({ isActive }) =>
@@ -31,9 +31,9 @@ const Sidebar = ({ isOpen }: { isOpen: boolean }) => {
           <FaHome /> Home
         </NavLink>
 
-        {/* ------------------------ 
-            ADMIN ONLY SECTION
-        ------------------------ */}
+        {/* ---------------------------
+              ADMIN SECTION
+        ---------------------------- */}
         {role === "admin" && (
           <>
             <NavLink
@@ -56,37 +56,71 @@ const Sidebar = ({ isOpen }: { isOpen: boolean }) => {
               <FaUsers /> QR Generator
             </NavLink>
 
-            <NavLink
-              to="/dashboard/teachers"
-              className={({ isActive }) =>
-                `flex items-center gap-2 px-3 py-2 rounded 
-                 ${isActive ? "bg-blue-100 text-blue-600 font-semibold" : "hover:bg-gray-200"}`
-              }
+            {/* ---------------------------
+                  TEACHER DROPDOWN
+            ---------------------------- */}
+            <button
+              onClick={() => setOpenTeacher(!openTeacher)}
+              className="flex items-center justify-between px-3 py-2 rounded hover:bg-gray-200"
             >
-              <FaChalkboardTeacher /> Teachers
-            </NavLink>
+              <div className="flex items-center gap-2">
+                <FaChalkboardTeacher /> Teachers
+              </div>
+              {openTeacher ? <MdExpandLess /> : <MdExpandMore />}
+            </button>
 
-            <NavLink
-              to="/dashboard/classes"
-              className={({ isActive }) =>
-                `flex items-center gap-2 px-3 py-2 rounded 
-                 ${isActive ? "bg-blue-100 text-blue-600 font-semibold" : "hover:bg-gray-200"}`
-              }
-            >
-              <FaSchool /> Classes
-            </NavLink>
+            {openTeacher && (
+              <div className="ml-8 flex flex-col space-y-1">
 
-            <NavLink
-              to="/dashboard/attendance"
-              className={({ isActive }) =>
-                `flex items-center gap-2 px-3 py-2 rounded 
-                 ${isActive ? "bg-blue-100 text-blue-600 font-semibold" : "hover:bg-gray-200"}`
-              }
-            >
-              <FaClipboardList /> Attendance
-            </NavLink>
+                <NavLink
+                  to="/dashboard/teachers"
+                  className={({ isActive }) =>
+                    `px-3 py-1 rounded ${
+                      isActive ? "bg-blue-100 text-blue-600 font-semibold" : "hover:bg-gray-200"
+                    }`
+                  }
+                >
+                  All Teachers
+                </NavLink>
 
-            {/* Inventory Dropdown — ADMIN ONLY */}
+                <NavLink
+                  to="/dashboard/pending-teachers"
+                  className={({ isActive }) =>
+                    `px-3 py-1 rounded ${
+                      isActive ? "bg-blue-100 text-blue-600 font-semibold" : "hover:bg-gray-200"
+                    }`
+                  }
+                >
+                  Pending Teachers
+                </NavLink>
+
+                <NavLink
+                  to="/dashboard/add-teacher"
+                  className={({ isActive }) =>
+                    `px-3 py-1 rounded ${
+                      isActive ? "bg-blue-100 text-blue-600 font-semibold" : "hover:bg-gray-200"
+                    }`
+                  }
+                >
+                  Add Teacher
+                </NavLink>
+
+                 <NavLink
+                  to="/dashboard/teacher-attendance"
+                  className={({ isActive }) =>
+                    `px-3 py-1 rounded ${
+                      isActive ? "bg-blue-100 text-blue-600 font-semibold" : "hover:bg-gray-200"
+                    }`
+                  }
+                >
+                  Teacher Attandances
+                </NavLink>
+                
+
+              </div>
+            )}
+
+            {/* Inventory Dropdown */}
             <button
               onClick={() => setOpenInventory(!openInventory)}
               className="flex items-center justify-between px-3 py-2 rounded hover:bg-gray-200"
@@ -99,43 +133,17 @@ const Sidebar = ({ isOpen }: { isOpen: boolean }) => {
 
             {openInventory && (
               <div className="ml-8 flex flex-col space-y-1">
-                <NavLink
-                  to="/dashboard/item"
-                  className={({ isActive }) =>
-                    `px-3 py-1 rounded 
-                     ${isActive ? "bg-blue-100 text-blue-600 font-semibold" : "hover:bg-gray-200"}`
-                  }
-                >
-                  Items
-                </NavLink>
-
-                <NavLink
-                  to="/dashboard/stock"
-                  className={({ isActive }) =>
-                    `px-3 py-1 rounded 
-                     ${isActive ? "bg-blue-100 text-blue-600 font-semibold" : "hover:bg-gray-200"}`
-                  }
-                >
-                  Stock
-                </NavLink>
-
-                <NavLink
-                  to="/dashboard/payment"
-                  className={({ isActive }) =>
-                    `px-3 py-1 rounded 
-                     ${isActive ? "bg-blue-100 text-blue-600 font-semibold" : "hover:bg-gray-200"}`
-                  }
-                >
-                  Payment
-                </NavLink>
+                <NavLink to="/dashboard/item" className="px-3 py-1 hover:bg-gray-200 rounded">Items</NavLink>
+                <NavLink to="/dashboard/stock" className="px-3 py-1 hover:bg-gray-200 rounded">Stock</NavLink>
+                <NavLink to="/dashboard/payment" className="px-3 py-1 hover:bg-gray-200 rounded">Payment</NavLink>
               </div>
             )}
           </>
         )}
 
-        {/* ------------------------ 
-            TEACHER ONLY SECTION
-        ------------------------ */}
+        {/* ---------------------------
+              TEACHER SECTION
+        ---------------------------- */}
         {role === "teacher" && (
           <>
             <NavLink

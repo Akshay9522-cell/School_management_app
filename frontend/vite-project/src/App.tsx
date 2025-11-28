@@ -21,6 +21,9 @@ import StockPage from "./pages/Inventory/StockPage";
 import PaymentPage from "./pages/Inventory/PaymentPage";
 import GenerateQRCodePage from "./pages/GenerateQRCodePage";
 import QRScannerPage from "./pages/QRScannerPage";
+import PendingTeachers from "./pages/Teachers/PendingTeachers";
+import AddTeacherPage from "./pages/Teachers/AddTeacherPage";
+import TeacherAttendancePage from "./pages/Teachers/TeacherAttendancePage";
 
 
 function App() {
@@ -45,6 +48,10 @@ function App() {
   <Route path="teachers" element={<TeacherList />} />
   <Route path="teachers/add" element={<AddTeacher />} />
   <Route path="teachers/edit/:id" element={<EditTeacher />} />
+  <Route path="pending-teachers" element={<PendingTeachers />} />
+  <Route path="add-teacher" element={<AddTeacherPage/>}/>
+  <Route path="teacher-attendance" element={<TeacherAttendancePage/>}/>
+
   <Route path="classes" element={<ClassList />} />
   <Route path="classes/add" element={<AddClass />} />
   <Route path="students" element={<StudentList/>}/>
