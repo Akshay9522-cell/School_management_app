@@ -24,6 +24,8 @@ import QRScannerPage from "./pages/QRScannerPage";
 import PendingTeachers from "./pages/Teachers/PendingTeachers";
 import AddTeacherPage from "./pages/Teachers/AddTeacherPage";
 import TeacherAttendancePage from "./pages/Teachers/TeacherAttendancePage";
+import StudentDailyAttendance from "./pages/students/StudentDailyAttendance";
+import AttendanceSummaryPage from "./pages/students/AttendanceSummaryPage";
 
 
 function App() {
@@ -56,6 +58,8 @@ function App() {
   <Route path="classes/add" element={<AddClass />} />
   <Route path="students" element={<StudentList/>}/>
   <Route path="students/add" element={<AddStudent/>}/>
+  <Route path="student-daily-attendance" element={<StudentDailyAttendance/>}/>
+  <Route path="student-attendance-sheet" element={<AttendanceSummaryPage/>}/>
   // edit page is remaining
  
   <Route path="qrcode-scanner" element={<QRScannerPage/>}/>

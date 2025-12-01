@@ -1,27 +1,46 @@
-// import mongoose, { Schema, Document } from "mongoose";
+import mongoose, { Schema, Document } from "mongoose";
 
-// export interface IAttendance extends Document {
-//   student: mongoose.Types.ObjectId; // Ref Student
-//   class: mongoose.Types.ObjectId;   // Ref Class
-//   date: Date;                       // Attendance date
-//   status: "present" | "absent" | "leave"; // Attendance status
-//   createdAt: Date;
-//   updatedAt: Date;
-// }
+export interface IRecord {
+  studentId: mongoose.Types.ObjectId;
+  status: "present" | "absent" | "leave" | "late";
+  note?: string;
+}
 
-// const AttendanceSchema = new Schema<IAttendance>(
-//   {
-//     student: { type: Schema.Types.ObjectId, ref: "Student", required: true },
-//     class: { type: Schema.Types.ObjectId, ref: "Class", required: true },
-//     date: { type: Date, required: true },
-//     status: {
-//       type: String,
-//       enum: ["present", "absent", "leave"],
-//       required: true,
-//     },
-//   },
-//   { timestamps: true }
-// );
+export interface IAttendance extends Document {
+  classId: mongoose.Types.ObjectId;
+  date: Date; // date-only (normalized)
+  markedBy: mongoose.Types.ObjectId;
+  records: IRecord[];
+  locked: boolean;
+  createdAt: Date;
+  updatedAt: Date;
+}
 
-// export default mongoose.model<IAttendance>("Attendance", AttendanceSchema);
+const RecordSchema = new Schema<IRecord>(
+  {
+    studentId: { type: Schema.Types.ObjectId, ref: "Student", required: true },
+    status: {
+      type: String,
+      enum: ["present", "absent", "leave", "late"],
+      required: true,
+    },
+    note: { type: String, default: "" },
+  },
+  { _id: false }
+);
 
+const AttendanceSchema = new Schema<IAttendance>(
+  {
+    classId: { type: Schema.Types.ObjectId, ref: "Class", required: true },
+    date: { type: Date, required: true },
+    markedBy: { type: Schema.Types.ObjectId, ref: "Teacher", required: true },
+    records: { type: [RecordSchema], default: [] },
+    locked: { type: Boolean, default: false },
+  },
+  { timestamps: true }
+);
+
+// Unique per class per date to prevent duplicates
+AttendanceSchema.index({ classId: 1, date: 1 }, { unique: true });
+
+export default mongoose.model<IAttendance>("Attendance", AttendanceSchema);

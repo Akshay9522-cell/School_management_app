@@ -19,6 +19,7 @@ import inventory  from './routes/inventory.routes'
 
 import classRoomRoutes from './routes/classroom.routes'
 import qrRoutes from "./routes/qr.routes";
+import studentDailyattendance from './routes/studentAttendance.routes'
 // import busRoutes from "./routes/buses";
 // import inventoryRoutes from "./routes/inventory";
 
@@ -59,6 +60,7 @@ app.use("/api/feesservice", feesService);
 app.use("/api/inventory",inventory)
 app.use('/api/classroom/',classRoomRoutes)
 app.use("/api/qr", qrRoutes);
+app.use("/api/attendance",studentDailyattendance)
 
 // app.use("/api/buses", busRoutes);
 // app.use("/api/inventory", inventoryRoutes);

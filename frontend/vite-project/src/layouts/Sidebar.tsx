@@ -1,6 +1,7 @@
 import { NavLink } from "react-router-dom";
-import { FaUsers, FaChalkboardTeacher, FaSchool, FaClipboardList, FaHome } from "react-icons/fa";
-import { MdInventory2, MdExpandLess, MdExpandMore } from "react-icons/md";
+import { FaUsers, FaChalkboardTeacher, FaSchool, FaClipboardList, FaHome,FaFileDownload } from "react-icons/fa";
+import { MdInventory2, MdExpandLess, MdExpandMore, } from "react-icons/md";
+import { SiGooglesheets } from "react-icons/si";
 import { useState } from "react";
 import Cookies from "js-cookie";
 
@@ -164,6 +165,28 @@ const Sidebar = ({ isOpen }: { isOpen: boolean }) => {
               }
             >
               <FaClipboardList /> Attendance
+            </NavLink>
+
+              <NavLink
+              to="/dashboard/student-daily-attendance"
+              className={({ isActive }) =>
+                `flex items-center gap-2 px-3 py-2 rounded 
+                 ${isActive ? "bg-blue-100 text-blue-600 font-semibold" : "hover:bg-gray-200"}`
+              }
+            >
+             <SiGooglesheets /> Student Daily Attendance
+            </NavLink>
+
+            
+              <NavLink
+              to="/dashboard/student-attendance-sheet"
+              className={({ isActive }) =>
+                `flex items-center gap-2 px-3 py-2 rounded 
+                 ${isActive ? "bg-blue-100 text-blue-600 font-semibold" : "hover:bg-gray-200"}`
+              }
+            >
+              <FaFileDownload />
+ Download Attandance sheet
             </NavLink>
           </>
         )}

@@ -30,24 +30,43 @@ export const addStudentService = async (data: any) => {
   if (!classExists) throw new Error("Invalid classId provided");
 
   // ---------- ATOMIC ROLL NO ----------
-  const counter = await ClassCounter.findOneAndUpdate(
-    { classId: data.classId },
-    { $inc: { lastRollNo: 1 } },
-    { new: true, upsert: true } // create if not exists
-  );
+ // ---------- SAFE ATOMIC ROLL NO ----------
+let assignedRoll = null;
 
-  data.rollNo = counter.lastRollNo; // assign atomic roll number
+for (let i = 0; i < 5; i++) {
+  try {
+    // Try to increment and lock a new roll number
+    const counter = await ClassCounter.findOneAndUpdate(
+      { classId: data.classId },
+      { $inc: { lastRollNo: 1 } },
+      { new: true, upsert: true }
+    );
 
-  // Create student
-  const student = await Student.create(data);
+    assignedRoll = counter.lastRollNo;
 
-  // Add student reference to class
-  await Class.findByIdAndUpdate(data.classId, {
-    $addToSet: { students: student._id },
-  });
+    // Try to create student
+    const student = await Student.create({
+      ...data,
+      rollNo: assignedRoll,
+    });
 
-  return student;
-};
+    // Store roll & attach to class
+    await Class.findByIdAndUpdate(data.classId, {
+      $addToSet: { students: student._id },
+    });
+
+    return student; // SUCCESS 🎉
+  } catch (err: any) {
+    if (err.code === 11000) {
+      console.log("Roll duplicate detected → retrying...");
+      continue; // Try again
+    }
+    throw err;
+  }
+}
+
+throw new Error("Roll number generation failed after multiple attempts");
+}
 
 
   // Get students with filters (className or classId, section, search, roll range)
