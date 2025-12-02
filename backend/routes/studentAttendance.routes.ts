@@ -10,7 +10,7 @@ const router = Router();
 
 router.post("/mark", auth, markAttendance);
 router.get("/", auth, getAttendanceByClassDate);
-router.get("/summary", auth, attendanceSummary);
+router.get("/studentsummary", auth, attendanceSummary);
 router.get("/student/:studentId", auth, getStudentAttendance);
 
 export default router;

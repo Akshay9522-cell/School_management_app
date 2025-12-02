@@ -36,7 +36,7 @@ function App() {
 
     {/* Public Route */}
     <Route path="/admin/login" element={<Login />} />
-
+ <Route index element={<Login />} />   
     {/* Protected Dashboard Routes */}
    <Route
   path="/dashboard"
@@ -46,7 +46,7 @@ function App() {
     </ProtectedRoute>
   }
 >
-  <Route index element={<Dashboard />} />   
+ 
   <Route path="teachers" element={<TeacherList />} />
   <Route path="teachers/add" element={<AddTeacher />} />
   <Route path="teachers/edit/:id" element={<EditTeacher />} />

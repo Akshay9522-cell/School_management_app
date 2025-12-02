@@ -1,10 +1,10 @@
 import { api } from "./api";
 
 export interface AttendanceSummaryParams {
+
   classId: string;
   studentId?: string;
-  startDate: string;
-  endDate: string;
+  date:string
 }
 
 
@@ -19,12 +19,12 @@ export const markDailyAttendance = async (payload: any) => {
 export const getAttendanceSummary = async (params: AttendanceSummaryParams) => {
   const query: Record<string, string> = {
     classId: params.classId,
-    startDate: params.startDate,
-    endDate: params.endDate,
+    date: params.date,
+ 
   };
   if (params.studentId) query.studentId = params.studentId;
 
-  return api.get(`/attendance/summary?${new URLSearchParams(query).toString()}`);
+  return api.get(`/attendance/studentsummary?${new URLSearchParams(query).toString()}`);
 };
 
 

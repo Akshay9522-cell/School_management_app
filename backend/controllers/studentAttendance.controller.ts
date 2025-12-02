@@ -99,38 +99,109 @@ export const getAttendanceByClassDate = async (req: Request, res: Response) => {
  * Returns basic present/absent counts per class across date range
  */
 export const attendanceSummary = async (req: Request, res: Response) => {
-  const { classId, from, to, studentId } = req.query;
-  if (!classId || !from || !to) return res.status(400).json({ message: "classId, from and to required" });
-
-  const classObjId = new mongoose.Types.ObjectId(String(classId));
-  const fromDate = toDateOnly(String(from));
-  const toDate = toDateOnly(String(to));
-
   try {
-    // aggregate present count and total records
+    const { classId, studentId, date } = req.query;
+
+    // Validate required params
+    if (!classId || !date) {
+      return res.status(400).json({
+        success: false,
+        message: "classId and date are required",
+      });
+    }
+
+    // Validate ObjectId
+    if (!mongoose.Types.ObjectId.isValid(String(classId))) {
+      return res.status(400).json({
+        success: false,
+        message: "Invalid classId",
+      });
+    }
+
+    const classObjId = new mongoose.Types.ObjectId(String(classId));
+
+    function parseDateOnly(d: string) {
+      const p = d.split("-");
+      return new Date(Date.UTC(Number(p[0]), Number(p[1]) - 1, Number(p[2])));
+    }
+    // Normalize date (remove time)
+     const inputDate = parseDateOnly(String(date));
+
+    const start = new Date(inputDate);
+    start.setUTCHours(0, 0, 0, 0);
+
+    const end = new Date(inputDate);
+    end.setUTCHours(23, 59, 59, 999);
+
+    console.log({ start, end });
+
+
+    // Build pipeline
     const pipeline: any[] = [
-      { $match: { classId: classObjId, date: { $gte: fromDate, $lte: toDate } } },
-      { $unwind: "$records" },
-      // optional filter by studentId
-      ...(studentId ? [{ $match: { "records.studentId": new mongoose.Types.ObjectId(String(studentId)) } }] : []),
       {
-        $group: {
-          _id: "$records.status",
-          count: { $sum: 1 },
+        $match: {
+          classId: classObjId,
+          date: { $gte: start, $lte: end },
         },
       },
+      { $unwind: "$records" },
+
+      ...(studentId
+        ? [
+            {
+              $match: {
+                "records.studentId": new mongoose.Types.ObjectId(String(studentId)),
+              },
+            },
+          ]
+        : []),
+
+      
+         {
+        $lookup: {
+          from: "students",
+          localField: "records.studentId",
+          foreignField: "_id",
+          as: "student",
+        },
+      },
+      { $unwind: "$student" },
+
+      // Final detailed projection
+      {
+        $project: {
+          _id: 0,
+          studentId: "$student._id",
+          studentName: "$student.name",
+          status: "$records.status",
+          note: "$records.note",
+        },
+      },
+      
     ];
 
     const result = await Attendance.aggregate(pipeline);
-    // convert to friendly object
-    const summary: any = {};
-    result.forEach((r: any) => (summary[r._id] = r.count));
-    return res.json({ summary });
+
+    // Format summary
+    const summary = {
+      present: result.filter((d) => d.status === "present").length,
+      absent: result.filter((d) => d.status === "absent").length,
+    };
+
+    return res.json({
+      success: true,
+      summary,
+      result
+    });
   } catch (err) {
-    console.error(err);
-    return res.status(500).json({ message: "Server error" });
+    console.error("Attendance Summary Error:", err);
+    return res.status(500).json({
+      success: false,
+      message: "Server error",
+    });
   }
 };
+
 
 /**
  * GET /api/attendance/student/:studentId?from=...&to=...
@@ -193,77 +264,90 @@ const result = await Attendance.aggregate(pipeline);
   }
 };
 
-export const getAttendanceSummary = async (req: Request, res: Response) => {
-  try {
-    const { classId, studentId, startDate, endDate } = req.query;
+// export const getAttendanceSummary = async (req: Request, res: Response) => {
+//   try {
+//     const { classId, studentId, date } = req.query;
 
-    if (!classId || !startDate || !endDate) {
-      return res.status(400).json({
-        success: false,
-        message: "classId, startDate and endDate are required",
-      });
-    }
+//     console.log("QUERY RECEIVED:", req.query);
 
-    // Validate ObjectId
-    if (!mongoose.Types.ObjectId.isValid(classId as string)) {
-      return res.status(400).json({ success: false, message: "Invalid classId" });
-    }
+//     if (!classId || !date) {
+//       return res.status(400).json({
+//         success: false,
+//         message: "classId and date are required",
+//       });
+//     }
 
-    const start = new Date(String(startDate));
-    start.setHours(0, 0, 0, 0);
-    const end = new Date(String(endDate));
-    end.setHours(23, 59, 59, 999);
+//     if (!mongoose.Types.ObjectId.isValid(classId as string)) {
+//       return res.status(400).json({
+//         success: false,
+//         message: "Invalid classId",
+//       });
+//     }
 
-    const pipeline: PipelineStage[] = [
-      {
-        $match: {
-          classId: new mongoose.Types.ObjectId(String(classId)),
-          date: { $gte: start, $lte: end },
-        },
-      },
-      { $unwind: "$records" },
-      ...(studentId
-        ? [
-            {
-              $match: {
-                "records.studentId": new mongoose.Types.ObjectId(String(studentId)),
-              },
-            },
-          ]
-        : []),
-      {
-        $lookup: {
-          from: "students",
-          localField: "records.studentId",
-          foreignField: "_id",
-          as: "student",
-        },
-      },
-      { $unwind: "$student" },
-      {
-        $project: {
-          date: 1,
-          studentName: "$student.name",
-          status: "$records.status",
-          note: "$records.note",
-        },
-      },
-      { $sort: { date: -1, studentName: 1 } },
-    ];
+//     const fromDate = toDateOnly(String(date));
+//     const start = new Date(fromDate);
+//     start.setHours(0, 0, 0, 0);
 
-    const summary = await Attendance.aggregate(pipeline);
+//     const end = new Date(fromDate);
+//     end.setHours(23, 59, 59, 999);
 
-    const present = summary.filter((s) => s.status.toLowerCase() === "present").length;
-    const total = summary.length;
-    const percentage = total === 0 ? 0 : Math.round((present / total) * 100);
+//     const pipeline: PipelineStage[] = [
+//       {
+//         $match: {
+//           classId: new mongoose.Types.ObjectId(String(classId)),
+//           date: { $gte: start, $lte: end },
+//         },
+//       },
+//       { $unwind: "$records" },
 
-    return res.status(200).json({
-      success: true,
-      summary,
-      stats: { present, total, percentage },
-    });
-  } catch (err: any) {
-    console.error("Attendance Summary Error:", err);
-    return res.status(500).json({ success: false, message: err.message });
-  }
-};
+//       ...(studentId
+//         ? [
+//             {
+//               $match: {
+//                 "records.studentId": new mongoose.Types.ObjectId(String(studentId)),
+//               },
+//             },
+//           ]
+//         : []),
+
+//       {
+//         $lookup: {
+//           from: "students",
+//           localField: "records.studentId",
+//           foreignField: "_id",
+//           as: "student",
+//         },
+//       },
+//       { $unwind: "$student" },
+
+//       {
+//         $project: {
+//           date: 1,
+//           studentName: "$student.name",
+//           status: "$records.status",
+//           note: "$records.note",
+//         },
+//       },
+
+//       { $sort: { studentName: 1 } },
+//     ];
+
+//     const summary = await Attendance.aggregate(pipeline);
+
+//     const present = summary.filter((s) => s.status.toLowerCase() === "present").length;
+//     const total = summary.length;
+//     const percentage = total ? Math.round((present / total) * 100) : 0;
+
+//     return res.status(200).json({
+//       success: true,
+//       summary,
+//       stats: { present, total, percentage },
+//     });
+//   } catch (err: any) {
+//     console.error("Attendance Summary Error:", err);
+//     return res.status(500).json({
+//       success: false,
+//       message: err.message,
+//     });
+//   }
+// };
