@@ -1,5 +1,5 @@
 import { NavLink } from "react-router-dom";
-import { FaUsers, FaChalkboardTeacher, FaSchool, FaClipboardList, FaHome,FaFileDownload } from "react-icons/fa";
+import { FaUsers, FaChalkboardTeacher, FaSchool, FaClipboardList, FaHome,FaFileDownload, FaBus } from "react-icons/fa";
 import { MdInventory2, MdExpandLess, MdExpandMore, } from "react-icons/md";
 import { SiGooglesheets } from "react-icons/si";
 import { useState } from "react";
@@ -55,6 +55,17 @@ const Sidebar = ({ isOpen }: { isOpen: boolean }) => {
               }
             >
               <FaUsers /> QR Generator
+            </NavLink>
+
+            
+            <NavLink
+              to="/dashboard/bustracking"
+              className={({ isActive }) =>
+                `flex items-center gap-2 px-3 py-2 rounded 
+                 ${isActive ? "bg-blue-100 text-blue-600 font-semibold" : "hover:bg-gray-200"}`
+              }
+            >
+              <FaBus />Bus TRacking
             </NavLink>
 
             {/* ---------------------------

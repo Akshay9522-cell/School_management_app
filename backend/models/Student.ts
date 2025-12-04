@@ -1,6 +1,5 @@
 // models/Student.ts
 import { Schema, model, Document } from "mongoose";
-import { truncate } from "node:fs/promises";
 
 export interface IStudent extends Document {
   name: string;
@@ -16,6 +15,16 @@ export interface IStudent extends Document {
   profileImage?: string;
   status: "Active" | "Inactive";
   classId?: Schema.Types.ObjectId;
+
+  parentUserId?: Schema.Types.ObjectId;
+
+  pickupLocation?: string;
+  dropLocation?: string;
+
+  busId?: Schema.Types.ObjectId;
+  routeId?: Schema.Types.ObjectId;
+
+  isBusAssigned: boolean;
 }
 
 const studentSchema = new Schema<IStudent>(
@@ -23,23 +32,43 @@ const studentSchema = new Schema<IStudent>(
     name: { type: String, required: true },
     email: { type: String, required: true },
     phone: { type: String, required: true },
-    rollNo: { type: Number, required: true},
+    rollNo: { type: Number, required: true },
     address: { type: String, required: true },
     parentName: { type: String, required: true },
     parentPhone: { type: String, required: true },
     admissionNo: { type: String, required: true },
     dob: { type: Date, required: true },
-    gender: { type: String, enum: ["Male", "Female", "Other"], required: true },
+    gender: {
+      type: String,
+      enum: ["Male", "Female", "Other"],
+      required: true,
+    },
 
     profileImage: { type: String, default: "" },
-    status: { type: String, enum: ["Active", "Inactive"], default: "Active" },
+    status: {
+      type: String,
+      enum: ["Active", "Inactive"],
+      default: "Active",
+    },
 
     classId: { type: Schema.Types.ObjectId, ref: "Class" },
+
+    // Parent linking
+    parentUserId: { type: Schema.Types.ObjectId, ref: "User", default: null },
+
+    // Bus tracking fields
+    pickupLocation: { type: String, default: "" },
+    dropLocation: { type: String, default: "" },
+
+    busId: { type: Schema.Types.ObjectId, ref: "Bus", default: null },
+    routeId: { type: Schema.Types.ObjectId, ref: "Route", default: null },
+
+    isBusAssigned: { type: Boolean, default: false },
   },
   { timestamps: true }
 );
 
-// Composite unique index if you want rollNo to be unique within a class+section:
-studentSchema.index({ classId: 1, rollNo: 1 }, { unique: true,  sparse: true });
+// Unique roll number inside class
+studentSchema.index({ classId: 1, rollNo: 1 }, { unique: true, sparse: true });
 
 export default model<IStudent>("Student", studentSchema);

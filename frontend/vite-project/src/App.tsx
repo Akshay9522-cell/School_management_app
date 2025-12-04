@@ -26,6 +26,7 @@ import AddTeacherPage from "./pages/Teachers/AddTeacherPage";
 import TeacherAttendancePage from "./pages/Teachers/TeacherAttendancePage";
 import StudentDailyAttendance from "./pages/students/StudentDailyAttendance";
 import AttendanceSummaryPage from "./pages/students/AttendanceSummaryPage";
+import BusTracking from "./pages/busTracking/BusTracking";
 
 
 function App() {
@@ -46,7 +47,7 @@ function App() {
     </ProtectedRoute>
   }
 >
- 
+  <Route path="bustracking" element={<BusTracking busId={"69313678b5d0ab76bef231d3"}/>}/>
   <Route path="teachers" element={<TeacherList />} />
   <Route path="teachers/add" element={<AddTeacher />} />
   <Route path="teachers/edit/:id" element={<EditTeacher />} />

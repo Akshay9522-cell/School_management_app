@@ -3,6 +3,9 @@ import type { Application } from "express";
 import cors from "cors";
 import dotenv from "dotenv";
 import connectDB from "./config/db";
+import { Server as SocketIOServer } from "socket.io";
+import http from "http";
+import { initSocket } from "./lib/socket";
 // import connectDB from "./config/db";
 
 import authRoutes from "./routes/auth";
@@ -16,10 +19,13 @@ import feeGenerationRoutes from "./routes/feeGenerationRoutes";
 import feePaymentRoutes from "./routes/feePaymentRoutes";
 import feesService from './routes/feesRoutes'
 import inventory  from './routes/inventory.routes'
-
+import busRoutes from './routes/Bus/bus.routes'
+import routeRoutes from './routes/Bus/route.routes'
+import stopRoutes from './routes/Bus/stop.routes'
 import classRoomRoutes from './routes/classroom.routes'
 import qrRoutes from "./routes/qr.routes";
 import studentDailyattendance from './routes/studentAttendance.routes'
+
 // import busRoutes from "./routes/buses";
 // import inventoryRoutes from "./routes/inventory";
 
@@ -61,10 +67,33 @@ app.use("/api/inventory",inventory)
 app.use('/api/classroom/',classRoomRoutes)
 app.use("/api/qr", qrRoutes);
 app.use("/api/attendance",studentDailyattendance)
+app.use('/api/buses',busRoutes)
+app.use('/api/route',routeRoutes)
+app.use('/api/stop',stopRoutes)
 
 // app.use("/api/buses", busRoutes);
 // app.use("/api/inventory", inventoryRoutes);
 
+const Server = http.createServer(app);
+const io = new SocketIOServer(Server, {
+  cors: {
+    origin: "http://localhost:5173",  // frontend port
+    methods: ["GET", "POST"],
+  },
+});
+
+io.on("connection", (socket: { id: any; on: (arg0: string, arg1: () => void) => void; }) => {
+  console.log("⚡ Client connected:", socket.id);
+
+  socket.on("disconnect", () => {
+    console.log("❌ Client disconnected:", socket.id);
+  });
+});
+
+Server.listen(4000, () => {
+  console.log("🚀 Server running on port 4000");
+});
+
 //app.get("/api/health", (_, res) => res.json({ status: "ok" }));
 
-app.listen(PORT, () => console.log(`Server running on port ${PORT}`));
+//app.listen(PORT, () => console.log(`Server running on port ${PORT}`));

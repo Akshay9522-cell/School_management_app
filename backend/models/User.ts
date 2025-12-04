@@ -5,13 +5,17 @@ export interface IUser extends Document {
   email: string;
   password: string;
   role: "admin" | "teacher" | "parent" | "student";
+
+   children?: Schema.Types.ObjectId[];
 }
 
 const userSchema = new Schema<IUser>({
   name: { type: String, required: true },
   email: { type: String, required: true, unique: true },
   password: { type: String, required: true },
-  role: { type: String, enum: ["admin", "teacher", "parent", "student"], default: "teacher" }
+  role: { type: String, enum: ["admin", "teacher", "parent", "student"], default: "teacher" },
+  
+  children: [{ type: Schema.Types.ObjectId, ref: "Student",default:[] }],
 });
 
 export default mongoose.model<IUser>("User", userSchema);
