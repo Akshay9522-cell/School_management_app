@@ -2,7 +2,7 @@
 
     export const addStudent = (data: any) => api.post("/students/add", data);
 
-    export const getStudents = (query: string) =>
+    export const getStudents = (query: string = " ") =>
     api.get(`/students/all${query}`);
 
     export const getStudentsByClass = (classId: string, query?: any) =>

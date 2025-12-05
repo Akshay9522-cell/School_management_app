@@ -1,7 +1,7 @@
 import { NavLink } from "react-router-dom";
 import { useParams } from "react-router-dom";
 import { FaUsers, FaChalkboardTeacher, FaSchool, FaClipboardList, FaHome,FaFileDownload, FaBus } from "react-icons/fa";
-import { MdInventory2, MdExpandLess, MdExpandMore, } from "react-icons/md";
+import { MdInventory2, MdExpandLess, MdExpandMore,MdOutlineAssignmentTurnedIn } from "react-icons/md";
 import { SiGooglesheets } from "react-icons/si";
 import { useEffect, useState } from "react";
 import Cookies from "js-cookie";
@@ -76,6 +76,16 @@ const Sidebar = ({ isOpen }: { isOpen: boolean }) => {
               }
             >
               <FaUsers /> QR Generator
+            </NavLink>
+
+            <NavLink
+              to="/dashboard/bus-assign"
+              className={({ isActive }) =>
+                `flex items-center gap-2 px-3 py-2 rounded 
+                 ${isActive ? "bg-blue-100 text-blue-600 font-semibold" : "hover:bg-gray-200"}`
+              }
+            >
+              <MdOutlineAssignmentTurnedIn /> Assign Bus 
             </NavLink>
 
             {

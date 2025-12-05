@@ -6,6 +6,7 @@ import {
   updateStudentService,
   deleteStudentService,
 } from "../services/student.service";
+import Student from "../models/Student";
 
 // ---------------- ADD STUDENT --------------------
 export const addStudent = async (req: Request, res: Response) => {
@@ -130,5 +131,26 @@ export const deleteStudent = async (req: Request, res: Response) => {
       success: false,
       message: "Failed to delete student",
     });
+  }
+};
+
+export const assignBusToRouteStudents = async (req:Request, res:Response  ) => {
+  try {
+    const { routeId, busId } = req.body;
+
+    // Update all students of this route
+    await Student.updateMany(
+      { routeId },
+      { busId: busId, isBusAssigned: true }
+    );
+
+    return res.json({
+      success: true,
+      message: "Bus assigned to all students of the route"
+    });
+
+  } catch (error) {
+    console.log(error);
+    return res.status(500).json({ success: false, message: "Server error" });
   }
 };

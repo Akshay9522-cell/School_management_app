@@ -7,6 +7,7 @@ import {
   getStudentById,
   updateStudent,
   deleteStudent,
+  assignBusToRouteStudents,
 } from "../controllers/student.controller";
 import {
   createStudentValidation,
@@ -20,6 +21,7 @@ router.get("/all", auth, getStudents);
 router.get("/:id", auth, getStudentById);
 router.put("/:id", auth, validate(updateStudentValidation), updateStudent);
 router.delete("/:id", auth, deleteStudent);
+router.post('/bus-assign',assignBusToRouteStudents)
 
 export default router;
   

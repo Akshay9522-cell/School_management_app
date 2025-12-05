@@ -2,6 +2,7 @@ import { Request, Response } from "express";
 import Bus from "../models/Bus/Bus";
 import RouteModel from "../models/Route";
 
+
 export const createBus = async (req: Request, res: Response) => {
   try {
     const { busNumber, driverName, driverPhone, routeId } = req.body;
@@ -87,3 +88,5 @@ export const assignRouteToBus = async (req: Request, res: Response) => {
     res.status(500).json({ success: false, message: error.message });
   }
 };
+
+

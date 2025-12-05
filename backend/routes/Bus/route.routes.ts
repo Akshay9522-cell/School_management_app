@@ -10,7 +10,7 @@ import {
 const router = Router();
 
 router.post("/create-route", createRoute);
-router.get("/", getRoutes);
+router.get("/get", getRoutes);
 router.get("/:id", getRouteById);
 router.put("/:id", updateRoute);
 router.delete("/:id", deleteRoute);

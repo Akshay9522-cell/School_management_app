@@ -26,6 +26,7 @@ import classRoomRoutes from './routes/classroom.routes'
 import qrRoutes from "./routes/qr.routes";
 import studentDailyattendance from './routes/studentAttendance.routes'
 import Bus from "./models/Bus/Bus";
+import parentRoute from './routes/parentRoutes'
 
 // import busRoutes from "./routes/buses";
 // import inventoryRoutes from "./routes/inventory";
@@ -71,6 +72,7 @@ app.use("/api/attendance",studentDailyattendance)
 app.use('/api/buses',busRoutes)
 app.use('/api/route',routeRoutes)
 app.use('/api/stop',stopRoutes)
+app.use('/api/parent',parentRoute)
 
 // app.use("/api/buses", busRoutes);
 // app.use("/api/inventory", inventoryRoutes);
