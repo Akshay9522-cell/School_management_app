@@ -1,13 +1,34 @@
 import { NavLink } from "react-router-dom";
+import { useParams } from "react-router-dom";
 import { FaUsers, FaChalkboardTeacher, FaSchool, FaClipboardList, FaHome,FaFileDownload, FaBus } from "react-icons/fa";
 import { MdInventory2, MdExpandLess, MdExpandMore, } from "react-icons/md";
 import { SiGooglesheets } from "react-icons/si";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import Cookies from "js-cookie";
+import axios from "axios";
+
+interface Bus{
+  _id:string
+}
 
 const Sidebar = ({ isOpen }: { isOpen: boolean }) => {
   const [openInventory, setOpenInventory] = useState(false);
   const [openTeacher, setOpenTeacher] = useState(false);
+  const[buses,setBuses]=useState<Bus[]>([])
+
+
+   async function bus(){
+      let api="http://localhost:4000/api/buses/get"
+     await axios.get(api).then((res)=>{
+      console.log(res.data.buses)
+      setBuses(res.data.buses)
+     })
+   }
+  useEffect(()=>{
+
+    bus()
+
+  },[])
 
   const role = Cookies.get("role");
 
@@ -57,16 +78,25 @@ const Sidebar = ({ isOpen }: { isOpen: boolean }) => {
               <FaUsers /> QR Generator
             </NavLink>
 
-            
-            <NavLink
-              to="/dashboard/bustracking"
+            {
+              buses.map((bus)=>{
+
+                return(
+                   <NavLink
+                    key={bus._id}
+             to={`/dashboard/bustracking/${bus._id}`}
+             
               className={({ isActive }) =>
                 `flex items-center gap-2 px-3 py-2 rounded 
                  ${isActive ? "bg-blue-100 text-blue-600 font-semibold" : "hover:bg-gray-200"}`
               }
             >
-              <FaBus />Bus TRacking
+              <FaBus />Bus TRacking 
             </NavLink>
+                )
+              })
+            }
+           
 
             {/* ---------------------------
                   TEACHER DROPDOWN

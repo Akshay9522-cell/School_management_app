@@ -4,10 +4,35 @@ import { Server as SocketIOServer } from "socket.io";
 
 let io: SocketIOServer;
 
+// --- Store dynamic bus locations ---
+const busLocations: Record<string, { lat: number; lng: number }> = {};
+
+// --- Function to simulate bus movement ---
+export const simulateBusMovement = (busId: string) => {
+  // Initialize bus location if not exists
+  if (!busLocations[busId]) {
+    busLocations[busId] = { lat: 28.6139, lng: 77.209 }; // starting coordinates
+  }
+
+  setInterval(() => {
+    const loc = busLocations[busId];
+    // small random movement
+    loc.lat += (Math.random() - 0.5) * 0.001;
+    loc.lng += (Math.random() - 0.5) * 0.001;
+
+    // Emit to clients in that bus room
+    if (io) {
+      io.to(`bus_${busId}`).emit("busLocationUpdate", { lat: loc.lat, lng: loc.lng });
+      console.log(`Bus ${busId} location emitted:`, { lat: loc.lat, lng: loc.lng });
+    }
+  }, 5000);
+};
+
+// --- Initialize Socket.io ---
 export const initSocket = (server: HTTPServer) => {
   io = new SocketIOServer(server, {
     cors: {
-      origin: "*", // you can restrict this later
+      origin: "*", // restrict later if needed
     },
   });
 
@@ -19,6 +44,11 @@ export const initSocket = (server: HTTPServer) => {
       if (!busId) return;
       socket.join(`bus_${busId}`);
       console.log(`Socket ${socket.id} joined room bus_${busId}`);
+
+      // Optionally, send current location immediately
+      if (busLocations[busId]) {
+        socket.emit("busLocationUpdate", busLocations[busId]);
+      }
     });
 
     // --- LEAVE BUS ROOM ---
@@ -36,7 +66,7 @@ export const initSocket = (server: HTTPServer) => {
   return io;
 };
 
-// Getter for io instance
+// --- Getter for io instance ---
 export const getIO = () => {
   if (!io) {
     throw new Error("Socket.io has not been initialized!");

@@ -5,7 +5,7 @@ import dotenv from "dotenv";
 import connectDB from "./config/db";
 import { Server as SocketIOServer } from "socket.io";
 import http from "http";
-import { initSocket } from "./lib/socket";
+import { initSocket, simulateBusMovement } from "./lib/socket";
 // import connectDB from "./config/db";
 
 import authRoutes from "./routes/auth";
@@ -25,6 +25,7 @@ import stopRoutes from './routes/Bus/stop.routes'
 import classRoomRoutes from './routes/classroom.routes'
 import qrRoutes from "./routes/qr.routes";
 import studentDailyattendance from './routes/studentAttendance.routes'
+import Bus from "./models/Bus/Bus";
 
 // import busRoutes from "./routes/buses";
 // import inventoryRoutes from "./routes/inventory";
@@ -75,21 +76,18 @@ app.use('/api/stop',stopRoutes)
 // app.use("/api/inventory", inventoryRoutes);
 
 const Server = http.createServer(app);
-const io = new SocketIOServer(Server, {
-  cors: {
-    origin: "http://localhost:5173",  // frontend port
-    methods: ["GET", "POST"],
-  },
-});
+initSocket(Server);  // <-- This is the ONLY socket init
 
-io.on("connection", (socket: { id: any; on: (arg0: string, arg1: () => void) => void; }) => {
-  console.log("⚡ Client connected:", socket.id);
+ const startBusSimulations = async () => {
+  const buses = await Bus.find(); // fetch all buses from DB
 
-  socket.on("disconnect", () => {
-    console.log("❌ Client disconnected:", socket.id);
+  buses.forEach(bus => {
+    simulateBusMovement((bus._id as any).toString());
+    console.log("Simulating bus:", (bus._id as any).toString());
   });
-});
+};
 
+startBusSimulations();
 Server.listen(4000, () => {
   console.log("🚀 Server running on port 4000");
 });

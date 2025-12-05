@@ -1,4 +1,6 @@
 import { Routes, Route, BrowserRouter } from "react-router-dom";
+import "leaflet/dist/leaflet.css";
+
 import ProtectedRoute from "./components/ProtectedRoute";
 import DashboardLayout from "./layouts/DashboardLayout";
 import './App.css'
@@ -27,6 +29,7 @@ import TeacherAttendancePage from "./pages/Teachers/TeacherAttendancePage";
 import StudentDailyAttendance from "./pages/students/StudentDailyAttendance";
 import AttendanceSummaryPage from "./pages/students/AttendanceSummaryPage";
 import BusTracking from "./pages/busTracking/BusTracking";
+import BusTrackingWrapper from "./pages/busTracking/BusTrackingWrapper";
 
 
 function App() {
@@ -44,10 +47,10 @@ function App() {
   element={
     <ProtectedRoute>
       <DashboardLayout />
-    </ProtectedRoute>
+    </ProtectedRoute> 
   }
 >
-  <Route path="bustracking" element={<BusTracking busId={"69313678b5d0ab76bef231d3"}/>}/>
+    <Route path="bustracking/:busId" element={<BusTrackingWrapper />} />
   <Route path="teachers" element={<TeacherList />} />
   <Route path="teachers/add" element={<AddTeacher />} />
   <Route path="teachers/edit/:id" element={<EditTeacher />} />
