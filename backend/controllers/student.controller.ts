@@ -7,6 +7,7 @@ import {
   deleteStudentService,
 } from "../services/student.service";
 import Student from "../models/Student";
+import Bus from "../models/Bus/Bus";
 
 // ---------------- ADD STUDENT --------------------
 export const addStudent = async (req: Request, res: Response) => {
@@ -136,14 +137,13 @@ export const deleteStudent = async (req: Request, res: Response) => {
 
 export const assignBusToRouteStudents = async (req:Request, res:Response  ) => {
   try {
-    const { routeId, busId } = req.body;
+    const { studentIds, busId } = req.body;
 
     // Update all students of this route
-    await Student.updateMany(
-      { routeId },
-      { busId: busId, isBusAssigned: true }
+   await Student.updateMany(
+      { _id: { $in: studentIds } },   // <-- FIXED: only selected students
+      { busId }
     );
-
     return res.json({
       success: true,
       message: "Bus assigned to all students of the route"
@@ -154,3 +154,40 @@ export const assignBusToRouteStudents = async (req:Request, res:Response  ) => {
     return res.status(500).json({ success: false, message: "Server error" });
   }
 };
+
+export const getStudentByFilterOfRouteAndBus = async (req: Request, res: Response) => {
+  try {
+    const { busId } = req.query;
+
+    if (!busId) {
+      return res.status(400).json({ success: false, message: "busId is required" });
+    }
+
+    // 1. Find the bus
+    const bus = await Bus.findById(busId).populate("routeId", "name description");
+
+    if (!bus) {
+      return res.status(404).json({ success: false, message: "Bus not found" });
+    }
+
+    // 2. Fetch all students assigned to that bus
+    const students = await Student.find({ busId })
+      .populate("busId", "busNumber driverName")
+      .populate("classId", "name");
+
+    res.json({
+      success: true,
+      routeId: bus.routeId, // Route details via bus
+      bus: {
+        busNumber: bus.busNumber,
+        driverName: bus.driverName,
+        route: bus.routeId
+      },
+      students
+    });
+
+  } catch (err: any) {
+    res.status(500).json({ success: false, error: err.message });
+  }
+};
+

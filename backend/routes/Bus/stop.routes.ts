@@ -10,7 +10,7 @@ import {
 const router = Router();
 
 router.post("/create", createStop);
-router.get("/", getStops);
+router.get("/get", getStops);
 router.get("/:id", getStopById);
 router.put("/:id", updateStop);
 router.delete("/:id", deleteStop);

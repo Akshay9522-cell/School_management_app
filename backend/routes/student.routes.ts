@@ -8,6 +8,7 @@ import {
   updateStudent,
   deleteStudent,
   assignBusToRouteStudents,
+  getStudentByFilterOfRouteAndBus,
 } from "../controllers/student.controller";
 import {
   createStudentValidation,
@@ -18,10 +19,12 @@ const router = Router();
 
 router.post("/add", auth, validate(createStudentValidation), addStudent);
 router.get("/all", auth, getStudents);
+router.get("/studentData",getStudentByFilterOfRouteAndBus)
 router.get("/:id", auth, getStudentById);
 router.put("/:id", auth, validate(updateStudentValidation), updateStudent);
 router.delete("/:id", auth, deleteStudent);
 router.post('/bus-assign',assignBusToRouteStudents)
+
 
 export default router;
   

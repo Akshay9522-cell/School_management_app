@@ -31,6 +31,10 @@ import AttendanceSummaryPage from "./pages/students/AttendanceSummaryPage";
 import BusTracking from "./pages/busTracking/BusTracking";
 import BusTrackingWrapper from "./pages/busTracking/BusTrackingWrapper";
 import StudentAssignToBus from "./pages/students/StudentAssignToBus";
+import StudentDataByBus from "./pages/students/StudentDataByBus";
+import BusList from "./pages/Buses/BusList";
+import RouteList from "./pages/Route/RouteList";
+import StopList from "./pages/Stop/StopList";
 
 
 function App() {
@@ -66,6 +70,10 @@ function App() {
   <Route path="student-daily-attendance" element={<StudentDailyAttendance/>}/>
   <Route path="student-attendance-sheet" element={<AttendanceSummaryPage/>}/>
   <Route path="bus-assign" element={<StudentAssignToBus/>}/>
+  <Route path='get-student-by-bus-route' element={<StudentDataByBus/>}/>
+  <Route path="create-bus" element={<BusList/>}/>
+  <Route path="create-route" element={<RouteList/>}/>
+  <Route path="create-stop" element={<StopList/>}/>
   // edit page is remaining
  
   <Route path="qrcode-scanner" element={<QRScannerPage/>}/>

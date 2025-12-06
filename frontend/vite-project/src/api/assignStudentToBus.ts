@@ -9,3 +9,9 @@ export const assignBusInBulk = (busId: string, studentIds: string[]) =>
 
 export const fetchRoute=()=>
     api.get('/route/get')
+
+export const getStudentByFilterOfRouteAndBus=(busId:string)=>
+   
+   api.get('/students/studentData',{
+    params:{busId}
+   })

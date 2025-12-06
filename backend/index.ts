@@ -34,13 +34,35 @@ import parentRoute from './routes/parentRoutes'
 dotenv.config();
 const app: Application = express();
 
+// CORS FIX (permanent)
+const allowedOrigins = [
+  "http://localhost:5173",
+  "http://localhost:5174",
+  "http://localhost:5175",
+  "http://localhost:3000",
+  "https://your-production-domain.com", // add production domain
+];
+
 app.use(
   cors({
-    origin: "http://localhost:5173",   // your React app
-    credentials: true,                 // allow cookies
-   
+    origin: (origin, callback) => {
+      if (!origin) return callback(null, true); // for Postman, mobile apps
+
+      // allow any localhost port automatically
+      if (origin.startsWith("http://localhost")) {
+        return callback(null, true);
+      }
+
+      if (allowedOrigins.includes(origin)) {
+        return callback(null, true);
+      }
+
+      return callback(new Error("🚫 CORS blocked: " + origin));
+    },
+    credentials: true,
   })
 );
+
 app.use(express.json());
 
 const PORT = process.env.PORT || 4000;
