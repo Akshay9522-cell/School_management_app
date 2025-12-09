@@ -1,88 +1,45 @@
-import { api } from "./api";
+import { api  } from "./api";
 
-// ---------------- TYPES ----------------
-export interface ItemPayload {
-  name: string;
-  sku?: string;
-  unit: string;
-  reorderLevel: number;
-  currentQuantity: number;
-  averageCost: number;
-}
+export const getCategories = () => api.get("/inventory/cat/all");
+export const getCategory = (id: any) => api.get(`/inventory/cat/${id}`);
+export const createCategory = (data: any) => api.post("/inventory/cat/add", data);
+export const updateCategory = (id: any, data: any) => api.put(`/inventory/cat/${id}`, data);
+export const deleteCategory = (id: any) => api.delete(`/inventory/cat/${id}`);
 
-export interface StockPayload {
-  itemId: string;
-  quantity: number;
-  note?: string;
-}
+export const getItems = () => api.get("/inventory/item/all");
+export const getItem = (id: any) => api.get(`/inventory/item/${id}`);
+export const createItem = (data: any) =>api.post("/inventory/item/add", data);
+export const updateItem = (id: any, data: any) =>api.put(`/inventory/item/${id}`, data);
+export const deleteItem = (id: any) =>api.delete(`/inventory/item/${id}`);
 
-export interface PaymentPayload {
-  amount: number;
-  currency: string;
-  paymentDate?: Date | string;
-  reference?: string;
-  itemId?: string;
-}
+export const getVendors = () => api.get("/inventory/vendors/all");
+export const getVendor = (id: any) => api.get(`/inventory/vendors/${id}`);
+export const createVendor = (data: any) =>api.post("/inventory/vendors/add", data);
+export const updateVendor = (id: any, data: any) =>api.put(`/inventory/vendors/${id}`, data);
+export const deleteVendor = (id: any) =>api.delete(`/inventory/vendors/${id}`);
 
-// ---------------- ITEMS ----------------
-export const getItems = async (params?: any) => {
-  const res = await api.get("/inventory/items", { params });
-  return res.data; // { items, page, total }
-};
+export const getPOs = () => api.get("/inventory/PO/all");
+export const getPO = (id: any) => api.get(`/inventory/PO/${id}`);
+export const receivePO = (id: any) => api.post(`/inventory/PO/${id}/recieve`);
 
-export const createItem = async (payload: ItemPayload) => {
-  const res = await api.post("/inventory/items", payload);
-  return res.data;
-};
+export const createPO = (data:any) => api.post('/inventory/PO/add',data) 
+export const updatePO = (id: any, data: any) =>api.put(`/inventory/PO/${id}`, data);
+export const deletePO = (id: any) =>api.delete(`/inventory/PO/${id}`);
 
-export const updateItem = async (id: string, payload: ItemPayload) => {
-  const res = await api.put(`/inventory/items/${id}`, payload);
-  return res.data;
-};
+// ISSUE
+export const issueItem = (data: any) => api.post("/inventory/issue/add", data);
+export const getIssues = () => api.get("/inventory/issue/all");
+export const deleteIssue = (id: string) => api.delete(`/inventory/issue/${id}`);
+export const getIssue = (id: string) => api.get(`/inventory/issue/${id}`);
 
-// ---------------- STOCK ----------------
-export const createStockIn = async (payload: StockPayload) => {
-  const res = await api.post("/inventory/stock/in", payload);
-  return res.data;
-};
 
-export const createStockOut = async (payload: StockPayload) => {
-  const res = await api.post("/inventory/stock/out", payload);
-  return res.data;
-};
+export const createReturn = (data: any) => api.post("/inventory/return/add", data);
+export const getReturns = () => api.get("/inventory/return/all");
+export const getReturn = (id: any) => api.get(`/inventory/return/${id}`);
+export const deleteReturn = (id: any) => api.delete(`/inventory/return/${id}`);
 
-export const getStockTransactions = async (params?: any) => {
-  const res = await api.get("/inventory/stock", { params });
-  return res.data;
-};
-
-// ---------------- PAYMENTS ----------------
-export const createPayment = async (payload: PaymentPayload) => {
-  const res = await api.post("/inventory/payments", payload);
-  return res.data;
-};
-
-export const getPayments = async (params?: any) => {
-  const res = await api.get("/inventory/payments", { params });
-  return res.data; // { payments, total }
-};
-// ---------- SUPPLIERS ----------
-export const getSuppliers = async (params?: any) => {
-  const res = await api.get("/inventory/suppliers", { params });
-  return res.data;
-};
-
-export const createSupplier = async (payload: any) => {
-  const res = await api.post("/inventory/suppliers", payload);
-  return res.data;
-};
-
-export const updateSupplier = async (id: string, payload: any) => {
-  const res = await api.put(`/inventory/suppliers/${id}`, payload);
-  return res.data;
-};
-
-export const deleteSupplier = async (id: string) => {
-  const res = await api.delete(`/inventory/suppliers/${id}`);
-  return res.data;
-};
+export const getLowStockReport = () => api.get("/inventory/reports/low-stock");
+export const getStockReport = () => api.get("/inventory/reports/stock");
+export const getUsageReport = () => api.get("/inventory/reports/usage");
+export const getReturnReport = () => api.get("/inventory/reports/returns");
+export const getPOStatusReport = () => api.get("/inventory/reports/po-status");

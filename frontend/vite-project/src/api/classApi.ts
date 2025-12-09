@@ -4,7 +4,7 @@ interface ClassQuery {
   page?: number;
   limit?: number;
   search?: string;
-  teacher?: string;
+  teacher?: string; 
 }
 
 export const getClasses = (query: ClassQuery) =>

@@ -16,11 +16,6 @@ import ClassList from "./pages/Classes/ClassList";
 import AddClass from "./pages/Classes/AddClass";
 import StudentList from "./pages/students/StudentList";
 import AddStudent from "./pages/students/AddStudent";
-
-
-import ItemsPage from "./pages/Inventory/ItemPage";
-import StockPage from "./pages/Inventory/StockPage";
-import PaymentPage from "./pages/Inventory/PaymentPage";
 import GenerateQRCodePage from "./pages/GenerateQRCodePage";
 import QRScannerPage from "./pages/QRScannerPage";
 import PendingTeachers from "./pages/Teachers/PendingTeachers";
@@ -35,6 +30,27 @@ import StudentDataByBus from "./pages/students/StudentDataByBus";
 import BusList from "./pages/Buses/BusList";
 import RouteList from "./pages/Route/RouteList";
 import StopList from "./pages/Stop/StopList";
+import CategoryList from "./pages/Inventory/category/CategoryList";
+import AddCategory from "./pages/Inventory/category/AddCategory";
+import EditCategory from "./pages/Inventory/category/EditCategory";
+import ItemList from "./pages/Inventory/Item/ItemLIst";
+import ItemAdd from "./pages/Inventory/Item/AddItem";
+import ItemEdit from "./pages/Inventory/Item/EditItem";
+import VendorList from "./pages/Inventory/Vendors/vendorsList";
+import VendorAdd from "./pages/Inventory/Vendors/VendorAdd";
+import VendorEdit from "./pages/Inventory/Vendors/VendorEdit";
+import POList from "./pages/Inventory/PO/POList";
+import POAdd from "./pages/Inventory/PO/POAdd";
+import POEdit from "./pages/Inventory/PO/POEdit";
+import IssueList from "./pages/Inventory/Issue/IssueList";
+import IssueAdd from "./pages/Inventory/Issue/AddIssue";
+import ReturnList from "./pages/Inventory/Return/ReturnList";
+import ReturnAdd from "./pages/Inventory/Return/AddReturn";
+import ReportCard from "./pages/reportCard/ReportCard";
+import AddTerm from "./pages/reportCard/AddTerm";
+import AddExam from "./pages/reportCard/AddExam";
+import AddDateSheet from "./pages/reportCard/AddDateSheet";
+
 
 
 function App() {
@@ -77,12 +93,45 @@ function App() {
   // edit page is remaining
  
   <Route path="qrcode-scanner" element={<QRScannerPage/>}/>
-  <Route path="item" element={<ItemsPage/>}/>
-  <Route path="stock" element={<StockPage/>}/>
-  <Route path="payment" element={<PaymentPage/>}/>
+ 
   <Route path="qrcodepage" element={<GenerateQRCodePage/>}/>
   
+  < Route path="categoryList" element={<CategoryList />}/>
+  < Route path="categoryAdd" element={<AddCategory />}/>
+  < Route path="category/:id" element={<EditCategory />}/>
 
+  <Route path="itemList" element={<ItemList/>}/>
+  <Route path="itemAdd" element={<ItemAdd/>}/>
+  <Route path ="item/:id" element={<ItemEdit/>}/>
+
+  <Route path="vendorList"  element={<VendorList/>}/>
+  <Route path="vendorAdd"  element={<VendorAdd/>}/>
+  <Route path="vendor/:id"  element={<VendorEdit/>}/>
+
+  <Route path="POList" element={<POList/>}/>
+  <Route path="poAdd" element={<POAdd/>}/>
+  <Route path="po/:id" element={<POEdit/>}/>
+
+
+  <Route path="issueList" element={<IssueList/>}/>
+  <Route path="issueAdd" element={<IssueAdd/>}/>
+
+  <Route path='returnList' element={<ReturnList/>}/>
+  <Route path='returnAdd' element={<ReturnAdd/>}/>
+
+
+  
+<Route path="report-card" element={<ReportCard />} />
+<Route path="add-term" element={<AddTerm />} />
+<Route path="add-exam" element={<AddExam />} />
+<Route path="add-datesheet" element={<AddDateSheet />} />
+
+
+  {/*<Route path="reports" element={<Reports/>}/>
+
+  <Route path="returnList" element={<ReturnList/>}/>
+  <Route path="addReturn" element={<AddReturn/>}/>
+  <Route path ="addStock" element={<AddStock/>}/> */}
 
 
 

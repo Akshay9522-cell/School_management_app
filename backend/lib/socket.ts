@@ -23,7 +23,7 @@ export const simulateBusMovement = (busId: string) => {
     // Emit to clients in that bus room
     if (io) {
       io.to(`bus_${busId}`).emit("busLocationUpdate", { lat: loc.lat, lng: loc.lng });
-      console.log(`Bus ${busId} location emitted:`, { lat: loc.lat, lng: loc.lng });
+      //console.log(`Bus ${busId} location emitted:`, { lat: loc.lat, lng: loc.lng });
     }
   }, 5000);
 };

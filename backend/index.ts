@@ -18,7 +18,7 @@ import feeStructureRoutes from './routes/feeStructureRoute'
 import feeGenerationRoutes from "./routes/feeGenerationRoutes";
 import feePaymentRoutes from "./routes/feePaymentRoutes";
 import feesService from './routes/feesRoutes'
-import inventory  from './routes/inventory.routes'
+// import inventory  from './routes/inventory.routes'
 import busRoutes from './routes/Bus/bus.routes'
 import routeRoutes from './routes/Bus/route.routes'
 import stopRoutes from './routes/Bus/stop.routes'
@@ -27,6 +27,10 @@ import qrRoutes from "./routes/qr.routes";
 import studentDailyattendance from './routes/studentAttendance.routes'
 import Bus from "./models/Bus/Bus";
 import parentRoute from './routes/parentRoutes'
+import inventory from "./routes/Inventory/inventory.routes";
+import subjectRoutes from "./routes/ReportCard/subjectRoutes"
+import reportCardRoutes from "./routes/ReportCard/report";
+import marks from './routes/ReportCard/marksRoutes'
 
 // import busRoutes from "./routes/buses";
 // import inventoryRoutes from "./routes/inventory";
@@ -95,7 +99,10 @@ app.use('/api/buses',busRoutes)
 app.use('/api/route',routeRoutes)
 app.use('/api/stop',stopRoutes)
 app.use('/api/parent',parentRoute)
-
+app.use('/api/inventory',inventory)
+app.use("/api/subjects", subjectRoutes);
+app.use("/api/reports", reportCardRoutes);
+app.use('/api/marks',marks)
 // app.use("/api/buses", busRoutes);
 // app.use("/api/inventory", inventoryRoutes);
 
