@@ -46,10 +46,7 @@ import IssueList from "./pages/Inventory/Issue/IssueList";
 import IssueAdd from "./pages/Inventory/Issue/AddIssue";
 import ReturnList from "./pages/Inventory/Return/ReturnList";
 import ReturnAdd from "./pages/Inventory/Return/AddReturn";
-import ReportCard from "./pages/reportCard/ReportCard";
-import AddTerm from "./pages/reportCard/AddTerm";
-import AddExam from "./pages/reportCard/AddExam";
-import AddDateSheet from "./pages/reportCard/AddDateSheet";
+
 
 
 
@@ -121,10 +118,7 @@ function App() {
 
 
   
-<Route path="report-card" element={<ReportCard />} />
-<Route path="add-term" element={<AddTerm />} />
-<Route path="add-exam" element={<AddExam />} />
-<Route path="add-datesheet" element={<AddDateSheet />} />
+
 
 
   {/*<Route path="reports" element={<Reports/>}/>

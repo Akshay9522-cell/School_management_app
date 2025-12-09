@@ -183,19 +183,7 @@ const Sidebar = ({ isOpen }: { isOpen: boolean }) => {
               {isOpen && <span>Download Attendance Sheet</span>}
             </NavLink>
 
-             <NavLink to="/dashboard/add-term" className={({ isActive }) => `${baseLink} ${isActive ? activeLink : ""}`}>
-              <span className="flex h-9 w-9 items-center justify-center rounded-xl bg-gradient-to-br from-fuchsia-500/25 to-pink-500/15 text-fuchsia-300 group-hover:text-fuchsia-200"><FaFileDownload /></span>
-              {isOpen && <span>Add TERM</span>}
-            </NavLink>
-            
-             <NavLink to="/dashboard/add-exam" className={({ isActive }) => `${baseLink} ${isActive ? activeLink : ""}`}>
-              <span className="flex h-9 w-9 items-center justify-center rounded-xl bg-gradient-to-br from-fuchsia-500/25 to-pink-500/15 text-fuchsia-300 group-hover:text-fuchsia-200"><FaFileDownload /></span>
-              {isOpen && <span>Add Exam</span>}
-            </NavLink>
-              <NavLink to="/dashboard/add-datesheet" className={({ isActive }) => `${baseLink} ${isActive ? activeLink : ""}`}>
-              <span className="flex h-9 w-9 items-center justify-center rounded-xl bg-gradient-to-br from-fuchsia-500/25 to-pink-500/15 text-fuchsia-300 group-hover:text-fuchsia-200"><FaFileDownload /></span>
-              {isOpen && <span>Add Datesheet</span>}
-            </NavLink>
+             
           </>
         )}
       </nav>
