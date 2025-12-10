@@ -46,6 +46,8 @@ import IssueList from "./pages/Inventory/Issue/IssueList";
 import IssueAdd from "./pages/Inventory/Issue/AddIssue";
 import ReturnList from "./pages/Inventory/Return/ReturnList";
 import ReturnAdd from "./pages/Inventory/Return/AddReturn";
+import StepOne from "./pages/ReportCard/StepOne";
+import ReportCard from "./pages/ReportCard/ReportCard";
 
 
 
@@ -115,6 +117,9 @@ function App() {
 
   <Route path='returnList' element={<ReturnList/>}/>
   <Route path='returnAdd' element={<ReturnAdd/>}/>
+
+  <Route path="report-card" element={<StepOne/>}/>
+  <Route path="step_two/:id"  element={<ReportCard/>}/>
 
 
   
