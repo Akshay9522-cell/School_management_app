@@ -1,6 +1,7 @@
 import React, { useEffect, useState } from 'react';
 import { useParams } from 'react-router-dom';
 import { getStudentById } from '../../api/studentApi';
+import axios from "axios";
 
 interface Marks {
   id?: string;
@@ -32,6 +33,7 @@ const ReportCard = () => {
   ]);
   const [loading, setLoading] = useState(true);
   const [editing, setEditing] = useState(false);
+  const [selectedTerm,setSelectedTerm] = useState<string>(" ")
 
   const loadStudent = async () => {
     if (!id) return;
@@ -90,12 +92,42 @@ const ReportCard = () => {
     setMarks(marks.filter((_, i) => i !== index));
   };
 
-  const saveReport = () => {
-    console.log('Saving report:', { studentId: id, marks });
-    // Save to API here
-    alert('Report saved successfully!');
+// inside ReportCard component (frontend)
+
+
+const saveReport = async () => {
+  try {
+    const payloadMarks = marks.map(m => {
+      const total = Number(m.totalMarks ?? 100);
+      const practical = Number(m.practicalMarks ?? 0);
+      const theory = Number(m.theoryMarks ?? 0);
+      const obtained = practical + theory;
+      const percentage = total > 0 ? (obtained / total) * 100 : 0;
+
+      return {
+        subject: m.subject,
+        totalMarks: total,
+        practicalMarks: practical,
+        theoryMarks: theory,
+        obtained,
+        percentage: Number(percentage.toFixed(2)),
+      };
+    });
+
+    await axios.post("http://localhost:4000/api/reports/add", {
+      studentId: id,
+      term: selectedTerm, // or let teacher choose
+      marks: payloadMarks,
+    });
+
+    alert("Report saved successfully");
     setEditing(false);
-  };
+  } catch (err) {
+    console.error(err);
+    alert("Failed to save report");
+  }
+};
+
 
   useEffect(() => {
     loadStudent();
@@ -132,6 +164,19 @@ const ReportCard = () => {
             </div>
             <div className="text-center lg:col-span-2">
               <div className="inline-flex gap-2">
+
+                 <select
+                  value={selectedTerm}
+                  onChange={(e) => setSelectedTerm(e.target.value)}
+                 
+                  className={`px-4 py-2 rounded-lg border border-slate-300 bg-white text-gray-700 font-medium 
+                    ${editing ? "cursor-pointer" : "opacity-50 cursor-not-allowed"}`}
+                >
+                  <option value="Term 1">Term 1</option>
+                  <option value="Term 2">Term 2</option>
+                  <option value="Final">Final</option>
+                </select>
+
                 <button
                   onClick={() => setEditing(!editing)}
                   className="px-6 py-2 bg-blue-500 text-white rounded-lg hover:bg-blue-600 font-medium transition-all"

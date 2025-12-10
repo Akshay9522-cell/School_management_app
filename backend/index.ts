@@ -28,6 +28,7 @@ import studentDailyattendance from './routes/studentAttendance.routes'
 import Bus from "./models/Bus/Bus";
 import parentRoute from './routes/parentRoutes'
 import inventory from "./routes/Inventory/inventory.routes";
+import reportRoutes from "./routes/reportcard/reportRoutes";
 
 // import busRoutes from "./routes/buses";
 // import inventoryRoutes from "./routes/inventory";
@@ -97,6 +98,7 @@ app.use('/api/route',routeRoutes)
 app.use('/api/stop',stopRoutes)
 app.use('/api/parent',parentRoute)
 app.use('/api/inventory',inventory)
+app.use("/api/reports", reportRoutes);
 
 // app.use("/api/buses", busRoutes);
 // app.use("/api/inventory", inventoryRoutes);
