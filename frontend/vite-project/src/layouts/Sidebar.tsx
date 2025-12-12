@@ -187,6 +187,19 @@ const Sidebar = ({ isOpen }: { isOpen: boolean }) => {
               <span className="flex h-9 w-9 items-center justify-center rounded-xl bg-gradient-to-br from-fuchsia-500/25 to-pink-500/15 text-fuchsia-300 group-hover:text-fuchsia-200"><FaFileDownload /></span>
               {isOpen && <span>Create Report-Card</span>}
             </NavLink>
+             <NavLink to="/dashboard/create-hw" className={({ isActive }) => `${baseLink} ${isActive ? activeLink : ""}`}>
+              <span className="flex h-9 w-9 items-center justify-center rounded-xl bg-gradient-to-br from-fuchsia-500/25 to-pink-500/15 text-fuchsia-300 group-hover:text-fuchsia-200"><FaFileDownload /></span>
+              {isOpen && <span>Create Homework</span>}
+            </NavLink>
+             <NavLink to="/dashboard/class-hw" className={({ isActive }) => `${baseLink} ${isActive ? activeLink : ""}`}>
+              <span className="flex h-9 w-9 items-center justify-center rounded-xl bg-gradient-to-br from-fuchsia-500/25 to-pink-500/15 text-fuchsia-300 group-hover:text-fuchsia-200"><FaFileDownload /></span>
+              {isOpen && <span>Class HomeWork</span>}
+            </NavLink>
+             <NavLink to="/dashboard/teacher-hw" className={({ isActive }) => `${baseLink} ${isActive ? activeLink : ""}`}>
+              <span className="flex h-9 w-9 items-center justify-center rounded-xl bg-gradient-to-br from-fuchsia-500/25 to-pink-500/15 text-fuchsia-300 group-hover:text-fuchsia-200"><FaFileDownload /></span>
+              {isOpen && <span>Teacher HomeWork</span>}
+            </NavLink>
+
           </>
         )}
       </nav>

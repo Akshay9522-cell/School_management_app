@@ -48,6 +48,9 @@ import ReturnList from "./pages/Inventory/Return/ReturnList";
 import ReturnAdd from "./pages/Inventory/Return/AddReturn";
 import StepOne from "./pages/ReportCard/StepOne";
 import ReportCard from "./pages/ReportCard/ReportCard";
+import CreateHomework from "./pages/homeWork/CreateHomework";
+import ClassHomeworkList from "./pages/homeWork/ClassHomeworkList";
+
 
 
 
@@ -120,6 +123,12 @@ function App() {
 
   <Route path="report-card" element={<StepOne/>}/>
   <Route path="step_two/:id"  element={<ReportCard/>}/>
+
+  <Route path="create-hw" element={<CreateHomework/>}/>
+ 
+  <Route path="class-hw" element={<ClassHomeworkList/>}/>
+  
+
 
 
   

@@ -15,6 +15,7 @@ import {
   updateTeacherValidation,
 } from "../validations/teacherValidation";
 
+
 const router = express.Router();
 
 router.post("/add", validate(createTeacherValidation), addTeacher);
@@ -25,6 +26,7 @@ router.get("/", getTeachers);
 router.get("/:id", getTeacherById);
 router.put("/:id", validate(updateTeacherValidation), updateTeacher);
 router.delete("/:id", deleteTeacher);
+;
 
 
 export default router;
