@@ -1,17 +1,13 @@
 import mongoose, { Schema, Document } from "mongoose";
 
-export interface ITest {
-  subject: string;
-  marks: number;
-  total: number;
-}
+
 
 export interface IRecord {
   studentId: mongoose.Types.ObjectId;
   status: "present" | "absent" | "leave" | "late";
-  homework: "done" | "not_done";
+ 
   note?: string;
-  tests?: ITest[]; // ✅ new
+ 
 }
 
 export interface IAttendance extends Document {
@@ -24,14 +20,7 @@ export interface IAttendance extends Document {
   updatedAt: Date;
 }
 
-const TestSchema = new Schema<ITest>(
-  {
-    subject: { type: String, required: true, trim: true },
-    marks: { type: Number, required: true, min: 0 },
-    total: { type: Number, required: true, min: 1 },
-  },
-  { _id: false }
-);
+
 
 const RecordSchema = new Schema<IRecord>(
   {
@@ -47,21 +36,14 @@ const RecordSchema = new Schema<IRecord>(
       required: true,
     },
 
-    homework: {
-      type: String,
-      enum: ["done", "not_done"],
-      default: "not_done",
-    },
+  
 
     note: {
       type: String,
       default: "",
     },
 
-    tests: {
-      type: [TestSchema],
-      default: [], // ✅ tests array for each student
-    },
+    
   },
   { _id: false }
 );

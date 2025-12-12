@@ -6,7 +6,7 @@ import { toDateOnly } from "../utils/date";
 
 /**
  * POST /api/attendance/mark
- * body: { classId, date, records: [{ studentId, status, note?, homework?, tests? }], force?: boolean }
+ * body: { classId, date, records: [{ studentId, status, note? }], force?: boolean }
  */
 export const markAttendance = async (
   req: Request & { user?: any },
@@ -36,15 +36,11 @@ export const markAttendance = async (
         .json({ message: "Attendance locked for this date" });
     }
 
-    const sanitizeRecord = (r: any) => ({
+    const sanitized = (records as any[]).map((r) => ({
       studentId: new mongoose.Types.ObjectId(r.studentId),
       status: r.status,
       note: r.note || "",
-      homework: r.homework || "not_done",
-      tests: Array.isArray(r.tests) ? r.tests : [],
-    });
-
-    const sanitized = (records as any[]).map(sanitizeRecord);
+    }));
 
     if (!existing) {
       const att = new Attendance({
@@ -74,8 +70,6 @@ export const markAttendance = async (
           studentId: new mongoose.Types.ObjectId(r.studentId),
           status: r.status,
           note: r.note || "",
-          homework: r.homework || "not_done",
-          tests: Array.isArray(r.tests) ? r.tests : [],
         }));
         existingRetry.markedBy = new mongoose.Types.ObjectId(teacherId);
         await existingRetry.save();
@@ -96,10 +90,11 @@ export const getAttendanceByClassDate = async (
   res: Response
 ) => {
   const { classId, date } = req.query;
-  if (!classId || !date)
+  if (!classId || !date) {
     return res
       .status(400)
       .json({ message: "classId and date required" });
+  }
 
   const dateOnly = toDateOnly(String(date));
   try {
@@ -107,6 +102,7 @@ export const getAttendanceByClassDate = async (
       classId,
       date: dateOnly,
     }).populate("records.studentId", "name rollNo");
+
     if (!att) {
       const students = await Student.find({ classId }).select(
         "_id name rollNo"
@@ -122,7 +118,6 @@ export const getAttendanceByClassDate = async (
 
 /**
  * GET /api/attendance/summary?classId=...&date=YYYY-MM-DD&studentId=...
- * Returns basic present/absent counts for that date + detailed records
  */
 export const attendanceSummary = async (req: Request, res: Response) => {
   try {
@@ -195,8 +190,6 @@ export const attendanceSummary = async (req: Request, res: Response) => {
           studentName: "$student.name",
           status: "$records.status",
           note: "$records.note",
-          homework: "$records.homework",
-          tests: "$records.tests",
         },
       },
     ];
@@ -224,7 +217,6 @@ export const attendanceSummary = async (req: Request, res: Response) => {
 
 /**
  * GET /api/attendance/student/:studentId?from=YYYY-MM-DD&to=YYYY-MM-DD
- * Returns attendance entries for a student between dates (day-level)
  */
 export const getStudentAttendance = async (req: Request, res: Response) => {
   const { studentId } = req.params;
@@ -266,8 +258,6 @@ export const getStudentAttendance = async (req: Request, res: Response) => {
           date: 1,
           status: "$records.status",
           note: "$records.note",
-          homework: "$records.homework",
-          tests: "$records.tests",
         },
       },
       { $sort: { date: -1 } },

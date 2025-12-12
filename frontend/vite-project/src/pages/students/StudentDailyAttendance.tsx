@@ -1,4 +1,3 @@
-// src/pages/StudentDailyAttendance.tsx
 import { useEffect, useState } from "react";
 import { getClasses } from "../../api/classApi";
 import { getStudentsByClass } from "../../api/studentApi";
@@ -7,13 +6,6 @@ import dayjs from "dayjs";
 
 type AttendanceData = {
   status: "present" | "absent";
-  homework: "done" | "not_done";
-};
-
-type TestInput = {
-  subject: string;
-  marks: string;
-  total: string;
 };
 
 export default function StudentDailyAttendance() {
@@ -23,28 +15,6 @@ export default function StudentDailyAttendance() {
   const [attendance, setAttendance] = useState<Record<string, AttendanceData>>(
     {}
   );
-
-  const [openTestForStudent, setOpenTestForStudent] = useState<string | null>(
-    null
-  );
-  const [testInput, setTestInput] = useState<TestInput>({
-    subject: "",
-    marks: "",
-    total: "",
-  });
-
-  const [testMarks, setTestMarks] = useState<
-    Record<
-      string,
-      {
-        subject: string;
-        marks: number;
-        total: number;
-      }[]
-    >
-  >({});
-
-  const [submitting, setSubmitting] = useState(false);
 
   useEffect(() => {
     getClasses({ limit: 1000, page: 1 }).then((res) => {
@@ -63,11 +33,9 @@ export default function StudentDailyAttendance() {
     studentList.forEach((s: any) => {
       defaultAttendance[s._id] = {
         status: "present",
-        homework: "not_done",
       };
     });
     setAttendance(defaultAttendance);
-    setTestMarks({});
   };
 
   const markAttendance = (id: string, status: "present" | "absent") => {
@@ -77,62 +45,12 @@ export default function StudentDailyAttendance() {
     }));
   };
 
-  const toggleHomework = (id: string) => {
-    setAttendance((prev) => ({
-      ...prev,
-      [id]: {
-        ...prev[id],
-        homework: prev[id]?.homework === "done" ? "not_done" : "done",
-      },
-    }));
-  };
-
-  const handleOpenTestBox = (studentId: string) => {
-    setOpenTestForStudent(studentId);
-    setTestInput({ subject: "", marks: "", total: "" });
-  };
-
-  const handleSaveTestMarks = () => {
-    if (!openTestForStudent) return;
-
-    if (!testInput.subject || !testInput.marks || !testInput.total) {
-      alert("Please fill all test fields");
-      return;
-    }
-
-    const marksNum = Number(testInput.marks);
-    const totalNum = Number(testInput.total);
-    if (Number.isNaN(marksNum) || Number.isNaN(totalNum)) {
-      alert("Marks and total must be numbers");
-      return;
-    }
-
-    setTestMarks((prev) => {
-      const prevList = prev[openTestForStudent] || [];
-      return {
-        ...prev,
-        [openTestForStudent]: [
-          ...prevList,
-          {
-            subject: testInput.subject,
-            marks: marksNum,
-            total: totalNum,
-          },
-        ],
-      };
-    });
-
-    setOpenTestForStudent(null);
-  };
-
   const submitAttendance = async () => {
     if (!selectedClass) return alert("Select class first!");
 
     const records = Object.entries(attendance).map(([studentId, data]) => ({
       studentId,
       status: data.status,
-      homework: data.homework,
-      tests: testMarks[studentId] || [],
     }));
 
     const payload = {
@@ -142,19 +60,16 @@ export default function StudentDailyAttendance() {
     };
 
     try {
-      setSubmitting(true);
       const res = await markDailyAttendance(payload);
 
       if (res.data.success) {
         alert("Attendance Submitted Successfully!");
       } else {
-        alert(res.data.message || "Error submitting attendance");
+        alert(res.data.message);
       }
     } catch (error) {
       console.error(error);
       alert("Error submitting attendance");
-    } finally {
-      setSubmitting(false);
     }
   };
 
@@ -168,7 +83,7 @@ export default function StudentDailyAttendance() {
               Daily Student Attendance
             </h2>
             <p className="text-sm text-slate-500">
-              Mark presence, homework, and test marks for each student.
+              Mark presence for each student.
             </p>
           </div>
 
@@ -197,8 +112,6 @@ export default function StudentDailyAttendance() {
           {students.map((student: any) => {
             const studentAttendance = attendance[student._id] || {};
             const isPresent = studentAttendance.status === "present";
-            const homeworkDone = studentAttendance.homework === "done";
-            const testsForStudent = testMarks[student._id] || [];
 
             return (
               <div
@@ -211,19 +124,9 @@ export default function StudentDailyAttendance() {
                       {student.name}
                     </p>
                     <p className="text-xs text-slate-400">
-                      Roll: {student.rollNumber || "-"}
+                      Roll: {student.rollNo || "-"}
                     </p>
                   </div>
-
-                  {/* Small button to open test marks box */}
-                  <button
-                    type="button"
-                    onClick={() => handleOpenTestBox(student._id)}
-                    className="inline-flex items-center gap-1 rounded-full border border-slate-200 bg-slate-50 px-2 py-1 text-[11px] font-medium text-slate-600 hover:border-blue-400 hover:bg-blue-50 hover:text-blue-700"
-                  >
-                    <span className="h-1.5 w-1.5 rounded-full bg-blue-500" />
-                    Upload Test marks
-                  </button>
                 </div>
 
                 <div className="mb-3 flex items-center justify-between">
@@ -236,34 +139,10 @@ export default function StudentDailyAttendance() {
                   >
                     {isPresent ? "Present" : "Absent"}
                   </span>
-
-                  {testsForStudent.length > 0 && (
-                    <span className="rounded-full bg-indigo-50 px-2 py-0.5 text-[11px] font-semibold text-indigo-700">
-                      {testsForStudent.length} test
-                      {testsForStudent.length > 1 ? "s" : ""} added
-                    </span>
-                  )}
                 </div>
 
-                {/* Show list of tests (optional) */}
-                {testsForStudent.length > 0 && (
-                  <div className="mb-3 space-y-1">
-                    {testsForStudent.map((t, idx) => (
-                      <div
-                        key={idx}
-                        className="flex items-center justify-between rounded-lg bg-indigo-50 px-2 py-1 text-[11px] text-indigo-800"
-                      >
-                        <span className="font-semibold">{t.subject}</span>
-                        <span>
-                          {t.marks}/{t.total}
-                        </span>
-                      </div>
-                    ))}
-                  </div>
-                )}
-
                 {/* Attendance toggle buttons */}
-                <div className="mb-3 inline-flex rounded-full bg-slate-100 p-1 text-xs">
+                <div className="inline-flex rounded-full bg-slate-100 p-1 text-xs">
                   <button
                     type="button"
                     onClick={() => markAttendance(student._id, "present")}
@@ -287,40 +166,6 @@ export default function StudentDailyAttendance() {
                     Absent
                   </button>
                 </div>
-
-                {/* Homework checkbox */}
-                <div className="flex items-center justify-between rounded-xl bg-slate-50 px-3 py-2">
-                  <div className="flex items-center gap-2">
-                    <label className="relative inline-flex cursor-pointer items-center">
-                      <input
-                        type="checkbox"
-                        className="peer h-5 w-5 cursor-pointer rounded border border-slate-300 text-blue-600 transition-all checked:border-blue-600 checked:bg-blue-600 focus:ring-2 focus:ring-blue-500/40"
-                        checked={homeworkDone}
-                        onChange={() => toggleHomework(student._id)}
-                      />
-                      <span className="pointer-events-none absolute inset-0 flex items-center justify-center text-xs text-white opacity-0 peer-checked:opacity-100">
-                        ✓
-                      </span>
-                    </label>
-                    <div className="flex flex-col">
-                      <span className="text-sm font-medium text-slate-700">
-                        Homework done
-                      </span>
-                      <span className="text-xs text-slate-400">
-                        Tick if today&apos;s homework is completed
-                      </span>
-                    </div>
-                  </div>
-                  <span
-                    className={`rounded-full px-2 py-0.5 text-[11px] font-semibold ${
-                      homeworkDone
-                        ? "bg-blue-100 text-blue-700"
-                        : "bg-amber-100 text-amber-700"
-                    }`}
-                  >
-                    {homeworkDone ? "Done" : "Not done"}
-                  </span>
-                </div>
               </div>
             );
           })}
@@ -330,102 +175,14 @@ export default function StudentDailyAttendance() {
         {students.length > 0 && (
           <div className="mt-8 flex justify-end">
             <button
-              disabled={submitting}
               onClick={submitAttendance}
-              className={`inline-flex items-center gap-2 rounded-full px-6 py-2.5 text-sm font-semibold text-white shadow-md focus:outline-none focus:ring-2 focus:ring-blue-500/60 ${
-                submitting
-                  ? "bg-blue-300 cursor-not-allowed"
-                  : "bg-blue-600 hover:bg-blue-700 hover:shadow-lg"
-              }`}
+              className="inline-flex items-center gap-2 rounded-full bg-blue-600 px-6 py-2.5 text-sm font-semibold text-white shadow-md transition hover:bg-blue-700 hover:shadow-lg focus:outline-none focus:ring-2 focus:ring-blue-500/60"
             >
-              <span>{submitting ? "Submitting..." : "Submit Attendance"}</span>
+              <span>Submit Attendance</span>
             </button>
           </div>
         )}
       </div>
-
-      {/* Small modal for test marks */}
-      {openTestForStudent && (
-        <div className="fixed inset-0 z-40 flex items-center justify-center bg-black/30">
-          <div className="w-full max-w-sm rounded-2xl bg-white p-4 shadow-xl">
-            <h3 className="mb-3 text-sm font-semibold text-slate-800">
-              Add test marks
-            </h3>
-
-            <div className="mb-3">
-              <label className="mb-1 block text-xs font-medium text-slate-600">
-                Subject name
-              </label>
-              <input
-                type="text"
-                value={testInput.subject}
-                onChange={(e) =>
-                  setTestInput((prev) => ({
-                    ...prev,
-                    subject: e.target.value,
-                  }))
-                }
-                className="w-full rounded-lg border border-slate-300 px-3 py-1.5 text-sm focus:border-blue-500 focus:outline-none focus:ring-2 focus:ring-blue-500/30"
-                placeholder="e.g. Mathematics"
-              />
-            </div>
-
-            <div className="mb-4 flex gap-3">
-              <div className="w-1/2">
-                <label className="mb-1 block text-xs font-medium text-slate-600">
-                  Marks
-                </label>
-                <input
-                  type="number"
-                  value={testInput.marks}
-                  onChange={(e) =>
-                    setTestInput((prev) => ({
-                      ...prev,
-                      marks: e.target.value,
-                    }))
-                  }
-                  className="w-full rounded-lg border border-slate-300 px-3 py-1.5 text-sm focus:border-blue-500 focus:outline-none focus:ring-2 focus:ring-blue-500/30"
-                  placeholder="e.g. 18"
-                />
-              </div>
-              <div className="w-1/2">
-                <label className="mb-1 block text-xs font-medium text-slate-600">
-                  Out of
-                </label>
-                <input
-                  type="number"
-                  value={testInput.total}
-                  onChange={(e) =>
-                    setTestInput((prev) => ({
-                      ...prev,
-                      total: e.target.value,
-                    }))
-                  }
-                  className="w-full rounded-lg border border-slate-300 px-3 py-1.5 text-sm focus:border-blue-500 focus:outline-none focus:ring-2 focus:ring-blue-500/30"
-                  placeholder="e.g. 20"
-                />
-              </div>
-            </div>
-
-            <div className="flex justify-end gap-2">
-              <button
-                type="button"
-                onClick={() => setOpenTestForStudent(null)}
-                className="rounded-full px-4 py-1.5 text-xs font-medium text-slate-600 hover:bg-slate-100"
-              >
-                Cancel
-              </button>
-              <button
-                type="button"
-                onClick={handleSaveTestMarks}
-                className="rounded-full bg-blue-600 px-4 py-1.5 text-xs font-semibold text-white hover:bg-blue-700"
-              >
-                Save
-              </button>
-            </div>
-          </div>
-        </div>
-      )}
     </div>
   );
 }
