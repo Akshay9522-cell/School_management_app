@@ -103,7 +103,7 @@ app.use('/api/parent',parentRoute)
 app.use('/api/inventory',inventory)
 app.use("/api/reports", reportRoutes);
 app.use("/api/homework", homeworkRoute);
-app.use("./api/tests",testRoutes)
+app.use("/api/daily-Report",testRoutes)
 
 // app.use("/api/buses", busRoutes);
 // app.use("/api/inventory", inventoryRoutes);

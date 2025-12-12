@@ -50,6 +50,7 @@ import StepOne from "./pages/ReportCard/StepOne";
 import ReportCard from "./pages/ReportCard/ReportCard";
 import CreateHomework from "./pages/homeWork/CreateHomework";
 import ClassHomeworkList from "./pages/homeWork/ClassHomeworkList";
+import StudentDailyReports from "./pages/students/StudentDailyReport";
 
 
 
@@ -127,6 +128,8 @@ function App() {
   <Route path="create-hw" element={<CreateHomework/>}/>
  
   <Route path="class-hw" element={<ClassHomeworkList/>}/>
+
+  <Route path="sdr" element={<StudentDailyReports/>}/>
   
 
 

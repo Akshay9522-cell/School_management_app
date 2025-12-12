@@ -1,5 +1,5 @@
 import { Request, Response } from "express";
-import Homework from "../../models/HomeWork/homeWork";
+import Homework from "../../models/HomeWork/HomeworkStatus";
 import Class from "../../models/Class";
 import Student from "../../models/Student";
 

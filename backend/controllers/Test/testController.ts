@@ -1,78 +1,88 @@
-import Test from "../../models/Tests/Test";
+// controllers/dailyReportController.ts
 import { Request, Response } from "express";
+import mongoose from "mongoose";
+import HomeworkStatus from "../../models/HomeWork/DailyHomeWork";
+import TestResult from "../../models/Tests/TestResult";
+import { toDateOnly } from "../../utils/date";
 
-// CREATE TEST
-export const createTest = async (req: Request, res: Response) => {
+export const submitDailyReport = async (
+  req: Request & { user?: any },
+  res: Response
+) => {
+  const teacherId = req.user?.id;
+  const { classId, date, homework, tests } = req.body;
+
+  if (!classId || !date) {
+    return res
+      .status(400)
+      .json({ success: false, message: "classId and date are required" });
+  }
+
+  if (!Array.isArray(homework)) {
+    return res
+      .status(400)
+      .json({ success: false, message: "homework must be an array" });
+  }
+
+  const classObjId = new mongoose.Types.ObjectId(classId);
+  const dateOnly = toDateOnly(date);
+
   try {
-    const { classId, subjectName, maxMarks, testDate } = req.body;
+    // 1) Upsert homework for that class + date
+    const hwRecords = homework.map((h: any) => ({
+      studentId: new mongoose.Types.ObjectId(h.studentId),
+      status: h.status === "complete" ? "complete" : "incomplete",
+    }));
 
-    if (!classId || !subjectName || !maxMarks) {
-      return res.status(400).json({
-        success: false,
-        message: "classId, subjectName & maxMarks are required",
-      });
+    await HomeworkStatus.findOneAndUpdate(
+      { classId: classObjId, date: dateOnly },
+      {
+        $set: {
+          classId: classObjId,
+          date: dateOnly,
+          markedBy: new mongoose.Types.ObjectId(teacherId),
+          records: hwRecords,
+        },
+      },
+      { upsert: true, new: true, setDefaultsOnInsert: true }
+    );
+
+    // 2) Save tests only if provided and non-empty
+    if (Array.isArray(tests) && tests.length > 0) {
+      for (const t of tests) {
+        if (
+          !t.subject ||
+          typeof t.totalMarks !== "number" ||
+          !Array.isArray(t.records)
+        ) {
+          continue;
+        }
+
+        const testRecords = t.records.map((r: any) => ({
+          studentId: new mongoose.Types.ObjectId(r.studentId),
+          marks: Number(r.marks),
+        }));
+
+        const testDoc = new TestResult({
+          classId: classObjId,
+          subject: t.subject,
+          date: dateOnly,
+          totalMarks: t.totalMarks,
+          records: testRecords,
+        });
+
+        await testDoc.save();
+      }
     }
 
-    const test = await Test.create({
-      classId,
-      subjectName,
-      maxMarks,
-      testDate: testDate || new Date(),
+    return res.json({
+      success: true,
+      message: "Daily report saved successfully",
     });
-
-    res.json({ success: true, test });
-  } catch (error) {
-    console.error("Error creating test:", error);
-    res.status(500).json({ success: false, message: "Internal Server Error" });
-  }
-};
-
-// GET TESTS BY CLASS
-export const getTestsByClass = async (req: Request, res: Response) => {
-  try {
-    const { classId } = req.params;
-    const tests = await Test.find({ classId });
-
-    res.json({ success: true, tests });
-  } catch (error) {
-    console.error("Error fetching tests:", error);
-    res.status(500).json({ success: false, message: "Internal Server Error" });
-  }
-};
-
-// UPDATE TEST
-export const updateTest = async (req: Request, res: Response) => {
-  try {
-    const { testId } = req.params;
-    const updated = await Test.findByIdAndUpdate(testId, req.body, {
-      new: true,
-    });
-
-    if (!updated) {
-      return res.json({ success: false, message: "Test not found" });
-    }
-
-    res.json({ success: true, updated });
-  } catch (error) {
-    console.error("Error updating test:", error);
-    res.status(500).json({ success: false, message: "Internal Server Error" });
-  }
-};
-
-// DELETE TEST
-export const deleteTest = async (req: Request, res: Response) => {
-  try {
-    const { testId } = req.params;
-
-    const deleted = await Test.findByIdAndDelete(testId);
-
-    if (!deleted) {
-      return res.json({ success: false, message: "Test not found" });
-    }
-
-    res.json({ success: true, message: "Test deleted successfully" });
-  } catch (error) {
-    console.error("Error deleting test:", error);
-    res.status(500).json({ success: false, message: "Internal Server Error" });
+  } catch (err) {
+    console.error("submitDailyReport error:", err);
+    return res
+      .status(500)
+      .json({ success: false, message: "Server error" });
   }
 };
