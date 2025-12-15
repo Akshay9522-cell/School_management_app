@@ -2,11 +2,12 @@ import Cookies from "js-cookie";
 import { useNavigate } from "react-router-dom";
 import { FaBars } from "react-icons/fa";
 import { useState } from "react";
+import {  getUserName } from "../utils/auth";
 
 const Navbar = ({ onToggleSidebar }: { onToggleSidebar: () => void }) => {
   const navigate = useNavigate();
   const [open, setOpen] = useState(false);
-
+  const userName = getUserName();
   const role = Cookies.get("role");   // <--- GET ROLE FROM COOKIES
 
   const logout = () => {
@@ -18,13 +19,46 @@ const Navbar = ({ onToggleSidebar }: { onToggleSidebar: () => void }) => {
   };
 
   return (
-    <div className="h-16 bg-white flex items-center justify-between px-4 border-b shadow-sm">
+    <div className="h-16 bg-gradient-to-r from-slate-900 via-slate-800 to-slate-900 flex items-center justify-between px-4 border-b border-white/10 shadow-md backdrop-blur-lg">
+  {/* Left: menu */}
+  <button
+    onClick={onToggleSidebar}
+    className="inline-flex items-center justify-center h-9 w-9 rounded-full bg-white/5 text-slate-200 hover:bg-white/10 hover:text-white transition"
+  >
+    <FaBars size={18} />
+  </button>
 
-      <button onClick={onToggleSidebar} className="text-gray-600 text-xl">
-        <FaBars />
-      </button>
+  <h1
+    className="
+      inline-flex items-center
+      mr-150      rounded-2xl
+      border border-white/20
+      bg-white/10
+      px-4 py-2
+      text-sm font-medium
+      text-slate-100
+      shadow-lg shadow-sky-500/25
+      backdrop-blur-md
+    "
+  >
+    <span className="mr-5">Welcome!</span>
+    <span
+  className="
+    -ml-1 mr-2 flex h-8 w-8 items-center justify-center
+    rounded-full
+    bg-gradient-to-br from-sky-500 to-indigo-500
+    text-xs font-bold text-white
+  "
+>
+  {userName?.charAt(0).toUpperCase()}
+</span>
+<span className="drop-shadow-sm tracking-wide">
+  {userName}
+</span>
 
-      <h2 className="font-bold text-lg">Dashboard</h2>
+  </h1>
+
+      
 
       <div className="relative">
         <button

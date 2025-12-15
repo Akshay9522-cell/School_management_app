@@ -6,6 +6,7 @@ import { useEffect, useState, type JSX } from "react";
 import Cookies from "js-cookie";
 import axios from "axios";
 
+
 interface Bus {
   _id: string;
   name?: string;
@@ -79,10 +80,13 @@ const Sidebar = ({ isOpen }: { isOpen: boolean }) => {
           ))}
         </div>
       </div>
+      
+
     </div>
   );
 
   return (
+    
     <aside
       className={`relative z-20 h-screen ${isOpen ? "w-64" : "w-0"} transition-[width] duration-300 bg-slate-950/80 border-r border-white/10 backdrop-blur-xl flex flex-col`}
     >
@@ -91,14 +95,16 @@ const Sidebar = ({ isOpen }: { isOpen: boolean }) => {
 
       {/* Header */}
       <div className="relative flex items-center gap-3 px-4 pt-4 pb-3 border-b border-white/10">
-        <div className="flex h-10 w-10 items-center justify-center rounded-2xl bg-gradient-to-br from-sky-500 to-indigo-500 shadow-lg shadow-sky-500/40 text-white font-black text-lg">SD</div>
+       
         {isOpen && (
           <div>
+             <div className="flex h-10 w-10 items-center justify-center rounded-2xl bg-gradient-to-br from-sky-500 to-indigo-500 shadow-lg shadow-sky-500/40 text-white font-black text-lg">SD</div>
             <h1 className="text-base font-semibold text-white tracking-wide">School Dashboard</h1>
             <p className="text-[11px] uppercase tracking-[0.18em] text-slate-400">Classic Admin Panel</p>
           </div>
         )}
       </div>
+       
 
       {/* Navigation */}
       <nav className="relative flex-1 overflow-y-auto px-2 py-4 space-y-4">
@@ -161,6 +167,8 @@ const Sidebar = ({ isOpen }: { isOpen: boolean }) => {
         {/* Teacher Section */}
         {role === "teacher" && (
           <>
+          
+
             {isOpen && <p className="mt-3 px-2 text-[11px] font-semibold uppercase tracking-[0.18em] text-slate-500">Teacher Tools</p>}
 
              <NavLink to="/dashboard/sdr" className={({ isActive }) => `${baseLink} ${isActive ? activeLink : ""}`}>

@@ -29,15 +29,20 @@ const Login: React.FC = () => {
 
     try {
       const res = await loginAdmin(email, password);
-
+      console.log(res)
       // Save Token to Cookies
     // Save token
     setToken(res.token);
+    
 
     Cookies.set("teacherId", res.user._id, {
     expires: 7,
     sameSite: "strict",
   });
+    Cookies.set("userName", res.user.name, {
+      expires: 7,
+      sameSite: "strict",
+    });
 
     // Save role separately
     Cookies.set("role", res.user.role, {
