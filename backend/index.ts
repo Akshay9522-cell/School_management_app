@@ -7,7 +7,7 @@ import { Server as SocketIOServer } from "socket.io";
 import http from "http";
 import { initSocket, simulateBusMovement } from "./lib/socket";
 // import connectDB from "./config/db";
-
+dotenv.config();
 import authRoutes from "./routes/auth";
 import feeTypeRoutes from "./routes/feeTypeRoute";
 import studentRoutes from "./routes/student.routes";
@@ -36,7 +36,7 @@ import testRoutes from "./routes/reportcard/testRoutes"
 // import busRoutes from "./routes/buses";
 // import inventoryRoutes from "./routes/inventory";
 
-dotenv.config();
+
 const app: Application = express();
 
 // CORS FIX (permanent)
@@ -103,7 +103,7 @@ app.use('/api/parent',parentRoute)
 app.use('/api/inventory',inventory)
 app.use("/api/reports", reportRoutes);
 app.use("/api/homework", homeworkRoute);
-app.use("/api/daily-Report",testRoutes)
+app.use("/api/daily-Report  ",testRoutes)
 
 // app.use("/api/buses", busRoutes);
 // app.use("/api/inventory", inventoryRoutes);
