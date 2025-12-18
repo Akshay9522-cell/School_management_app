@@ -5,7 +5,7 @@ import {
   getRouteById,
   updateRoute,
   deleteRoute
-} from "../../controllers/route.controller";
+} from "../../controllers/Bus Tracking/route.controller";
 
 const router = Router();
 

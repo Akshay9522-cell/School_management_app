@@ -1,6 +1,6 @@
 import { Request, Response } from "express";
-import Bus from "../models/Bus/Bus";
-import RouteModel from "../models/Route";
+import Bus from "../../models/Bus/Bus";
+import RouteModel from "../../models/Route";
 
 
 export const createBus = async (req: Request, res: Response) => {

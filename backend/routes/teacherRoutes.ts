@@ -7,7 +7,8 @@ import {
   deleteTeacher,
   updateTeacherSubject,
   updateTeacherClass,
-  getUsersByRole,
+
+  getPendingTeachers,
 } from "../controllers/teacherController";
 import { validate } from "../middleware/validate";
 import {
@@ -19,7 +20,7 @@ import {
 const router = express.Router();
 
 router.post("/add", validate(createTeacherValidation), addTeacher);
-router.get('/user',getUsersByRole)
+router.get('/user',getPendingTeachers)
 router.put("/:id/class", updateTeacherClass);
 router.put('/:id/subject',updateTeacherSubject)
 router.get("/", getTeachers);

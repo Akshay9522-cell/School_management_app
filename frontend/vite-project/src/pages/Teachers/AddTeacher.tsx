@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from "react";
 import { getTeachers, updateTeacherSubject } from "../../api/teacherApi";
 import { useNavigate } from "react-router-dom";
+import toast, { Toaster } from "react-hot-toast";
 
 type Teacher = {
   name: string;
@@ -20,26 +21,44 @@ const AssignSubject = () => {
   }, []);
 
   const loadTeachers = async () => {
-    const res = await getTeachers({ all: "true" } as any);
-    setTeachers(res.data.data || []);
+    try {
+      const res = await getTeachers({ all: "true" } as any);
+      setTeachers(res.data.data || []);
+    } catch (err) {
+      toast.error("Failed to load teachers");
+    }
   };
 
-  const handleSubmit = async (e: any) => {
+  const validateForm = () => {
+    if (!selectedTeacher) {
+      toast.error("Please select a teacher");
+      return false;
+    }
+    if (!subject) {
+      toast.error("Please select a subject");
+      return false;
+    }
+    return true;
+  };
+
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
 
-    if (!selectedTeacher || !subject) {
-      alert("Please select teacher and subject");
-      return;
-    }
+     if (!validateForm()) {
+  toast.error("Please fill the form correctly");
+  return;
+}
 
     try {
       await updateTeacherSubject(selectedTeacher, subject);
-      alert("Subject assigned successfully!");
-      loadTeachers();
+      toast.success("Subject assigned successfully!");
+      await loadTeachers();
       navigate("/dashboard/teachers");
-    } catch (err) {
-      console.log(err);
-      alert("Failed to assign subject");
+    } catch (err: any) {
+      console.error(err);
+      toast.error(
+        err?.response?.data?.message || "Failed to assign subject. Try again."
+      );
     }
   };
 
@@ -84,7 +103,6 @@ const AssignSubject = () => {
                 className={inputGlass}
                 value={selectedTeacher}
                 onChange={(e) => setSelectedTeacher(e.target.value)}
-                required
               >
                 <option value="" className="text-slate-700">
                   Choose a teacher
@@ -113,7 +131,6 @@ const AssignSubject = () => {
                 className={inputGlass}
                 value={subject}
                 onChange={(e) => setSubject(e.target.value)}
-                required
               >
                 <option value="" className="text-slate-700">
                   Choose subject
@@ -221,6 +238,7 @@ const AssignSubject = () => {
           </form>
         </div>
       </div>
+      <Toaster/>
     </div>
   );
 };

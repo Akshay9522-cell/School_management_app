@@ -170,6 +170,19 @@ const Sidebar = ({ isOpen }: { isOpen: boolean }) => {
           
 
             {isOpen && <p className="mt-3 px-2 text-[11px] font-semibold uppercase tracking-[0.18em] text-slate-500">Teacher Tools</p>}
+             
+              {/* <NavLink to="/dashboard/question" className={({ isActive }) => `${baseLink} ${isActive ? activeLink : ""}`}>
+                <span className="flex h-9 w-9 items-center justify-center rounded-xl bg-gradient-to-br from-fuchsia-500/25 to-pink-500/15 text-fuchsia-300 group-hover:text-fuchsia-200"><FaFileDownload /></span>
+                {isOpen && <span>Questions </span>}
+              </NavLink>
+              <NavLink to="/dashboard/paper" className={({ isActive }) => `${baseLink} ${isActive ? activeLink : ""}`}>
+                <span className="flex h-9 w-9 items-center justify-center rounded-xl bg-gradient-to-br from-fuchsia-500/25 to-pink-500/15 text-fuchsia-300 group-hover:text-fuchsia-200"><FaFileDownload /></span>
+                {isOpen && <span>Blueprint Generate</span>}
+              </NavLink>*/}
+               <NavLink to="/dashboard/ai" className={({ isActive }) => `${baseLink} ${isActive ? activeLink : ""}`}>
+              <span className="flex h-9 w-9 items-center justify-center rounded-xl bg-gradient-to-br from-fuchsia-500/25 to-pink-500/15 text-fuchsia-300 group-hover:text-fuchsia-200"><FaFileDownload /></span>
+              {isOpen && <span>Smart paper Creator</span>}
+            </NavLink> 
 
              <NavLink to="/dashboard/sdr" className={({ isActive }) => `${baseLink} ${isActive ? activeLink : ""}`}>
               <span className="flex h-9 w-9 items-center justify-center rounded-xl bg-gradient-to-br from-emerald-500/25 to-emerald-400/10 text-emerald-300 group-hover:text-emerald-200"><FaUsers /></span>

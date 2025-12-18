@@ -1,10 +1,10 @@
-import { Router } from "express";
-import { recordPayment } from "../controllers/feePaymentController";
-import auth from "../middleware/auth";
+// import { Router } from "express";
+// import { recordPayment } from "../controllers/feePaymentController";
+// import auth from "../middleware/auth";
 
-const router = Router();
+// const router = Router();
 
-// PUT /api/fees/pay/:feeId
-router.put("/pay/:feeId", auth, recordPayment);
+// // PUT /api/fees/pay/:feeId
+// router.put("/pay/:feeId", auth, recordPayment);
 
-export default router;
+// export default router;

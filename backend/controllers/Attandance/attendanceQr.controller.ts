@@ -1,8 +1,8 @@
 import { Request, Response } from "express";
-import AttendanceService from "../services/attendance.Service";
-import Classroom, { IClassroom } from "../models/classroom";
-import Teacher, { ITeacher } from "../models/Teacher";
-import { verifyLocationRadius } from "../utils/location";
+import AttendanceService from "../../services/attendance.service";
+import Classroom, { IClassroom } from "../../models/classroom";
+import Teacher, { ITeacher } from "../../models/Teacher";
+import { verifyLocationRadius } from "../../utils/location";
 import mongoose from "mongoose";
 
 /**

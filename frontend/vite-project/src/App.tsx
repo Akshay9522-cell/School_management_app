@@ -52,11 +52,14 @@ import CreateHomework from "./pages/homeWork/CreateHomework";
 import ClassHomeworkList from "./pages/homeWork/ClassHomeworkList";
 import StudentDailyReports from "./pages/students/StudentDailyReport";
 
+import { useState } from "react";
+
 
 
 
 
 function App() {
+  const [teacherId] = useState('6940dd463a0c72f26a1f0fba');
   return (
   
     <BrowserRouter>
@@ -131,6 +134,7 @@ function App() {
 
   <Route path="sdr" element={<StudentDailyReports/>}/>
   
+
 
 
 

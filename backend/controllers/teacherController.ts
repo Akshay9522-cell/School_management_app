@@ -18,7 +18,7 @@ import bcrypt from 'bcryptjs';
 export const addTeacher = async (req: Request, res: Response) => {
   try {
     const { name, email, subject, phone, qualification, classIds } = req.body;
-
+   console.log(req.body)
     // 1️⃣ Check if user already exists
     let user = await User.findOne({ email });
 
@@ -74,35 +74,44 @@ export const addTeacher = async (req: Request, res: Response) => {
 };
 
 
-export const getUsersByRole = async (req: Request, res: Response) => {
+// GET /api/teachers/pending
+
+
+export const getPendingTeachers = async (req: Request, res: Response) => {
   try {
-    const role = (req.query.role as string)?.trim();  
-   
-    // Validate
-    if (!role) {
-      return res.status(400).json({
-        success: false,
-        message: "Role is required in query parameter",
-      });
-    }
+    // 1) all teacher users
+    const teacherUsers = await User.find({ role: "teacher" }).lean();
 
-    // Fetch from DB
-    const users = await User.find({ role });
+    const userIds = teacherUsers.map((u: any) => u._id);
 
-    res.status(200).json({
+    // 2) existing teacher profiles (with userId ref)
+    const teacherProfiles = await Teacher.find({ userId: { $in: userIds } })
+      .select("userId")
+      .lean();
+
+    const profUserIds = new Set(
+      teacherProfiles.map((p: any) => String(p.userId))
+    );
+
+    // 3) users that don't have a Teacher profile yet => pending
+    const pendingUsers = teacherUsers.filter(
+      (u: any) => !profUserIds.has(String(u._id))
+    );
+
+    return res.status(200).json({
       success: true,
-      count: users.length,
-      data: users,
+      count: pendingUsers.length,
+      data: pendingUsers,
     });
-  } catch (error) {
-    console.error("Error fetching users:", error);
-
-    res.status(500).json({
+  } catch (err) {
+    console.error("Error fetching pending teachers:", err);
+    return res.status(500).json({
       success: false,
-      message: "Server error while fetching users",
+      message: "Server error while fetching pending teachers",
     });
   }
 };
+
 
 
 

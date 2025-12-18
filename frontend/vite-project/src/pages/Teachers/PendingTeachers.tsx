@@ -6,17 +6,17 @@ export default function PendingTeachers() {
   const [pending, setPending] = useState<any[]>([]);
   const [loading, setLoading] = useState(true);
 
-  const fetchPending = async () => {
-    try {
-      setLoading(true);
-      const res = await axios.get("http://localhost:4000/api/teachers/user?role=teacher");
-      setPending(res.data.data || []);
-    } catch (error) {
-      console.error("Failed to fetch pending teachers", error);
-      setPending([]);
-    } finally {
-      setLoading(false);
-    }
+    const fetchPending = async () => {
+      try {
+        setLoading(true);
+        const res = await axios.get("http://localhost:4000/api/teachers/user?role=teacher&status=pending");
+        setPending(res.data.data || []);
+      } catch (error) {
+        console.error("Failed to fetch pending teachers", error);
+        setPending([]);
+      } finally {
+        setLoading(false);
+      }
   };
 
   useEffect(() => {

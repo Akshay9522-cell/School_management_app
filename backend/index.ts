@@ -9,15 +9,15 @@ import { initSocket, simulateBusMovement } from "./lib/socket";
 // import connectDB from "./config/db";
 dotenv.config();
 import authRoutes from "./routes/auth";
-import feeTypeRoutes from "./routes/feeTypeRoute";
+// import feeTypeRoutes from "./routes/feeTypeRoute";
 import studentRoutes from "./routes/student.routes";
 import teacherRoutes from './routes/teacherRoutes'
 import classRoutes from './routes/classRoutes'
 import attaendance from './routes/attandanceQr.routes'
-import feeStructureRoutes from './routes/feeStructureRoute'
-import feeGenerationRoutes from "./routes/feeGenerationRoutes";
-import feePaymentRoutes from "./routes/feePaymentRoutes";
-import feesService from './routes/feesRoutes'
+// import feeStructureRoutes from './routes/feeStructureRoute'
+// import feeGenerationRoutes from "./routes/feeGenerationRoutes";
+// import feePaymentRoutes from "./routes/feePaymentRoutes";
+//import feesService from './routes/feesRoutes'
 // import inventory  from './routes/inventory.routes'
 import busRoutes from './routes/Bus/bus.routes'
 import routeRoutes from './routes/Bus/route.routes'
@@ -31,6 +31,8 @@ import inventory from "./routes/Inventory/inventory.routes";
 import reportRoutes from "./routes/reportcard/reportRoutes";
 import homeworkRoute from "./routes/HomeWork/homeWorkRoutes"
 import testRoutes from "./routes/reportcard/testRoutes"
+import examRoutes from "./routes/examRoutes";
+import seedRoutes from "./routes/seedRoutes";
 
 
 // import busRoutes from "./routes/buses";
@@ -87,11 +89,11 @@ app.use('/api/teachers',teacherRoutes)
 app.use('/api/classes',classRoutes)
 app.use('/api/attendance',attaendance)
 
-app.use("/api/fee-types", feeTypeRoutes);
-app.use("/api/fee-structure", feeStructureRoutes);
-app.use("/api/fees", feeGenerationRoutes);
-app.use("/api/fees", feePaymentRoutes);
-app.use("/api/feesservice", feesService);
+// app.use("/api/fee-types", feeTypeRoutes);
+// app.use("/api/fee-structure", feeStructureRoutes);
+// app.use("/api/fees", feeGenerationRoutes);
+// app.use("/api/fees", feePaymentRoutes);
+//app.use("/api/feesservice", feesService);
 app.use("/api/inventory",inventory)
 app.use('/api/classroom/',classRoomRoutes)
 app.use("/api/qr", qrRoutes);
@@ -104,6 +106,8 @@ app.use('/api/inventory',inventory)
 app.use("/api/reports", reportRoutes);
 app.use("/api/homework", homeworkRoute);
 app.use("/api/daily-Report  ",testRoutes)
+app.use("/api/exam", examRoutes);
+app.use("/api/seed", seedRoutes);
 
 // app.use("/api/buses", busRoutes);
 // app.use("/api/inventory", inventoryRoutes);

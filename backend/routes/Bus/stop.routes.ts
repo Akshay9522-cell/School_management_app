@@ -5,7 +5,7 @@ import {
   getStopById,
   updateStop,
   deleteStop
-} from "../../controllers/stop.controller";
+} from "../../controllers/Bus Tracking/stop.controller";
 
 const router = Router();
 

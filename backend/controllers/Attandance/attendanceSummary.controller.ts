@@ -1,6 +1,6 @@
 import { Request, Response } from "express";
-import Attendance from "../models/attandance/TeacherAttendance";
-import Teacher from "../models/Teacher";
+import Attendance from "../../models/attandance/TeacherAttendance";
+import Teacher from "../../models/Teacher";
 
 export const attendanceSummary = async (req: Request, res: Response) => {
   try {

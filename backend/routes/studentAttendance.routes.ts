@@ -5,7 +5,7 @@ import {
   getAttendanceByClassDate,
   attendanceSummary,
   getStudentAttendance,
-} from "../controllers/studentAttendance.controller"
+} from "../controllers/Attandance/studentAttendance.controller"
 const router = Router();
 
 router.post("/mark", auth, markAttendance);

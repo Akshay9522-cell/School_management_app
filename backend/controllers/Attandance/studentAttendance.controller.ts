@@ -1,8 +1,8 @@
 import { Request, Response } from "express";
-import Attendance from "../models/Attendance";
-import Student from "../models/Student";
+import Attendance from "../../models/Attendance";
+import Student from "../../models/Student";
 import mongoose, { PipelineStage } from "mongoose";
-import { toDateOnly } from "../utils/date";
+import { toDateOnly } from "../../utils/date";
 
 /**
  * POST /api/attendance/mark

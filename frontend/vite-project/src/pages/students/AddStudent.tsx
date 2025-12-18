@@ -2,6 +2,7 @@ import { useEffect, useState } from "react";
 import { addStudent } from "../../api/studentApi";
 import { getClasses } from "../../api/classApi";
 import { useNavigate } from "react-router-dom";
+import toast, { Toaster } from "react-hot-toast";
 
 interface ClassType {
   _id: string;
@@ -31,23 +32,117 @@ const AddStudent = () => {
   }, []);
 
   const loadClasses = async () => {
-    const res = await getClasses({ page: 1, limit: 1000 });
-    setMyclass(res.data.classes || []);
+    try {
+      const res = await getClasses({ page: 1, limit: 1000 });
+      setMyclass(res.data.classes || []);
+    } catch (e) {
+      toast.error("Failed to load classes");
+    }
   };
 
-  const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement | HTMLTextAreaElement>) => {
+  const handleChange = (
+    e: React.ChangeEvent<
+      HTMLInputElement | HTMLSelectElement | HTMLTextAreaElement
+    >
+  ) => {
     setStudent({ ...student, [e.target.name]: e.target.value });
+  };
+
+  const validateForm = () => {
+    // name
+    if (!student.name.trim()) {
+      toast.error("Student name is required");
+      return false;
+    }
+
+    // email
+    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+    if (!student.email.trim()) {
+      toast.error("Email is required");
+      return false;
+    }
+    if (!emailRegex.test(student.email)) {
+      toast.error("Please enter a valid email");
+      return false;
+    }
+
+    // phone
+    if (!student.phone.trim()) {
+      toast.error("Student phone is required");
+      return false;
+    }
+    if (student.phone.trim().length < 10) {
+      toast.error("Student phone must be at least 10 digits");
+      return false;
+    }
+
+    // parent name
+    if (!student.parentName.trim()) {
+      toast.error("Parent / guardian name is required");
+      return false;
+    }
+
+    // parent phone
+    if (!student.parentPhone.trim()) {
+      toast.error("Parent phone is required");
+      return false;
+    }
+    if (student.parentPhone.trim().length < 10) {
+      toast.error("Parent phone must be at least 10 digits");
+      return false;
+    }
+
+    // admission no
+    if (!student.admissionNo.trim()) {
+      toast.error("Admission number is required");
+      return false;
+    }
+
+    // dob
+    if (!student.dob) {
+      toast.error("Date of birth is required");
+      return false;
+    }
+
+    // gender
+    if (!student.gender) {
+      toast.error("Please select gender");
+      return false;
+    }
+
+    // class
+    if (!student.classId) {
+      toast.error("Please select class");
+      return false;
+    }
+
+    // address
+    if (!student.address.trim()) {
+      toast.error("Address is required");
+      return false;
+    }
+
+    return true;
   };
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
 
+    // client-side validation
+  if (!validateForm()) {
+  toast.error("Please fill the form correctly");
+  return;
+}
+
+
     try {
       await addStudent(student);
-      alert("Student added successfully!");
+      toast.success("Student added successfully!");
       navigate("/dashboard/students");
     } catch (err: any) {
-      alert(err.response?.data?.message || "Failed to add student");
+      toast.error(
+        err?.response?.data?.message || "Failed to add student. Try again."
+      );
     }
   };
 
@@ -95,7 +190,6 @@ const AddStudent = () => {
                 name="name"
                 placeholder="Student name"
                 onChange={handleChange}
-                required
                 className={inputBase}
               />
             </div>
@@ -110,7 +204,6 @@ const AddStudent = () => {
                 type="email"
                 placeholder="student@example.com"
                 onChange={handleChange}
-                required
                 className={inputBase}
               />
             </div>
@@ -124,7 +217,6 @@ const AddStudent = () => {
                 name="phone"
                 placeholder="Phone number"
                 onChange={handleChange}
-                required
                 className={inputBase}
               />
             </div>
@@ -138,7 +230,6 @@ const AddStudent = () => {
                 name="admissionNo"
                 placeholder="Admission number"
                 onChange={handleChange}
-                required
                 className={inputBase}
               />
             </div>
@@ -152,7 +243,6 @@ const AddStudent = () => {
                 name="parentName"
                 placeholder="Parent name"
                 onChange={handleChange}
-                required
                 className={inputBase}
               />
             </div>
@@ -166,7 +256,6 @@ const AddStudent = () => {
                 name="parentPhone"
                 placeholder="Parent contact"
                 onChange={handleChange}
-                required
                 className={inputBase}
               />
             </div>
@@ -180,7 +269,6 @@ const AddStudent = () => {
                 type="date"
                 name="dob"
                 onChange={handleChange}
-                required
                 className={`${inputBase} [color-scheme:dark]`}
               />
             </div>
@@ -193,7 +281,6 @@ const AddStudent = () => {
               <select
                 name="gender"
                 onChange={handleChange}
-                required
                 className={`${inputBase} pr-8`}
               >
                 <option value="" className="text-slate-700">
@@ -219,7 +306,6 @@ const AddStudent = () => {
               <select
                 name="classId"
                 onChange={handleChange}
-                required
                 className={`${inputBase} pr-8`}
               >
                 <option value="" className="text-slate-700">
@@ -253,7 +339,6 @@ const AddStudent = () => {
                 name="address"
                 placeholder="Full address"
                 onChange={handleChange}
-                required
                 className={`${inputBase} min-h-[90px] resize-none`}
               />
             </div>
@@ -277,6 +362,7 @@ const AddStudent = () => {
           </form>
         </div>
       </div>
+      <Toaster/>
     </div>
   );
 };

@@ -1,31 +1,25 @@
-import express from "express";
-import {
-  createStudentFee,
-  getStudentFees,
-  getStudentFeeById,
-  addPayment,
-  deleteStudentFee,
-} from "../controllers/feesController";
-import auth from "../middleware/auth";
+// import express from "express";
 
-const router = express.Router();
+// import auth from "../middleware/auth";
 
-// ✅ All routes protected by auth middleware
-router.use(auth);
+// const router = express.Router();
 
-// Create a new fee record
-router.post("/", createStudentFee);
+// // ✅ All routes protected by auth middleware
+// router.use(auth);
 
-// Get all fees (with optional filters: student, class, month, year)
-router.get("/", getStudentFees);
+// // Create a new fee record
+// router.post("/", createStudentFee);
 
-// Get a fee by ID
-router.get("/:id", getStudentFeeById);
+// // Get all fees (with optional filters: student, class, month, year)
+// router.get("/", getStudentFees);
 
-// Add a payment to a fee
-router.post("/:id/payment", addPayment);
+// // Get a fee by ID
+// router.get("/:id", getStudentFeeById);
 
-// Delete a fee
-router.delete("/:id", deleteStudentFee);
+// // Add a payment to a fee
+// router.post("/:id/payment", addPayment);
 
-export default router;
+// // Delete a fee
+// router.delete("/:id", deleteStudentFee);
+
+// export default router;

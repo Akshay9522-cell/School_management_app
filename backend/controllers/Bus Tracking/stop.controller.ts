@@ -1,6 +1,6 @@
 import { Request, Response } from "express";
-import Stop from "../models/Bus/Stop";
-import Route from "../models/Bus/Route";
+import Stop from "../../models/Bus/Stop";
+import Route from "../../models/Bus/Route";
 import { Types } from "mongoose";
 
 // Create a stop

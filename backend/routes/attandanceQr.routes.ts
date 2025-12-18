@@ -1,7 +1,7 @@
 import { Router } from "express";
 import auth from "../middleware/auth";
-import { checkInWithQR, checkOutWithQR } from "../controllers/attendanceQr.controller";
-import { attendanceSummary } from "../controllers/attendanceSummary.controller";
+import { checkInWithQR, checkOutWithQR } from "../controllers/Attandance/attendanceQr.controller";
+import { attendanceSummary } from "../controllers/Attandance/attendanceSummary.controller";
 
 const router = Router();
 

@@ -6,8 +6,8 @@ import {
   updateBus,
   deleteBus,
   assignRouteToBus
-} from "../../controllers/bus.controller";
-import { updateBusLocation } from "../../controllers/busLocation.controller";
+} from "../../controllers/Bus Tracking/bus.controller";
+import { updateBusLocation } from "../../controllers/Bus Tracking/busLocation.controller";
 
 const router = Router();
 

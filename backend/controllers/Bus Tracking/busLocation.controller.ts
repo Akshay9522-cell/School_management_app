@@ -1,8 +1,8 @@
 import { Request, Response } from "express";
-import Bus from "../models/Bus/Bus";
-import { getIO } from "../lib/socket";
-import Route from "../models/Bus/Route";
-import Stop from "../models/Bus/Stop";
+import Bus from "../../models/Bus/Bus";
+import { getIO } from "../../lib/socket";
+import Route from "../../models/Bus/Route";
+import Stop from "../../models/Bus/Stop";
 import { Types } from "mongoose";
 
 

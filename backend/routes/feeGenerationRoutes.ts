@@ -1,9 +1,9 @@
-import { Router } from "express";
-import { generateMonthlyFees } from "../controllers/feeGenerationController";
-import auth from "../middleware/auth";
+// import { Router } from "express";
+// import { generateMonthlyFees } from "../controllers/feeGenerationController";
+// import auth from "../middleware/auth";
 
-const router = Router();
+// const router = Router();
 
-router.post("/generate", auth, generateMonthlyFees);
+// router.post("/generate", auth, generateMonthlyFees);
 
-export default router;
+// export default router;

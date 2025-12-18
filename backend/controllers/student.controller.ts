@@ -13,7 +13,7 @@ import Bus from "../models/Bus/Bus";
 export const addStudent = async (req: Request, res: Response) => {
   try {
     const student = await addStudentService(req.body);
-    console.log(student)
+  
     return res.status(201).json({
       success: true,
       message: "Student added successfully",
