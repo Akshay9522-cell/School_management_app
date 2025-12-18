@@ -14,15 +14,13 @@ export const checkInWithQR = async (req: Request, res: Response) => {
     const teacherFromToken = (req as any).user;
    
 
-      console.log("Teacher ID from token:", (req as any).user?.id);
-    console.log("Teacher ID from body:", req.body.teacherId)
+    //   console.log("Teacher ID from token:", (req as any).user?.id);
+    // console.log("Teacher ID from body:", req.body.teacherId)
     const { classroomCode, teacherId: teacherIdFromBody, lat, lng } = req.body;
    
-
-  const teacherId = teacherFromToken?.role === "teacher" 
-  ? teacherFromToken.id 
-  : teacherIdFromBody;
-
+  //console.log(req.body)
+  const teacherId = teacherIdFromBody;
+  
   
 console.log("Teacher ID from token:", teacherFromToken?.id);
 console.log("Teacher ID from body:", teacherIdFromBody);
@@ -46,6 +44,7 @@ console.log("Teacher ID from body:", teacherIdFromBody);
     }
 
     const teacher = await Teacher.findById(teacherId) as ITeacher | null;
+    console.log(teacher)
   
     if (!teacher) {
       return res.status(404).json({ success: false, message: "Teacher not found" });
@@ -94,11 +93,12 @@ export const checkOutWithQR = async (req: Request, res: Response) => {
     const teacherIdFromToken = (req as any).user?.id;
     const { classroomCode, teacherId: teacherIdFromBody, lat, lng } = req.body;
 
-    const teacherId = teacherIdFromToken || teacherIdFromBody;
+    const teacherId = teacherIdFromBody;
     if (!classroomCode || !teacherId) {
       return res.status(400).json({ success: false, message: "classroomCode & teacherId required" });
     }
-
+    console.log(teacherId)
+     
     const classroom = await Classroom.findOne({ code: classroomCode }) as IClassroom | null;
     if (!classroom) {
       return res.status(404).json({ success: false, message: "Invalid classroom QR" });

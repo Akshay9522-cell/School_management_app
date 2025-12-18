@@ -9,6 +9,7 @@ export default function QRScannerPage() {
 
   const scannerRef = useRef<any>(null);
   const teacherId = Cookies.get("teacherId");
+  console.log(teacherId)
   const token = Cookies.get("token");
 
   if (!teacherId) {
@@ -32,79 +33,83 @@ export default function QRScannerPage() {
   }, []);
 
   // ---------- SCAN SUCCESS ----------
-  const onScanSuccess = async (qrText: string) => {
-    if (busy) return;
-    setBusy(true);
+const onScanSuccess = async (qrText: string) => {
+  if (busy) return;
+  setBusy(true);
+
+  try {
+    console.log("QR Scanned:", qrText);
+
+    let classroomCode: string | null = null;
 
     try {
-      console.log("QR Scanned:", qrText);
-
-      const url = new URL(qrText);
-     let classroomCode = url.searchParams.get("classroomCode");
-
-     if (!classroomCode) {
-  const parts = url.pathname.split("/");
-  classroomCode = parts[parts.length - 1] || null;
-}
-
-console.log("Extracted classroomCode:", classroomCode);
+      // works for full URL or path like /xyz if you give base
+      const url = new URL(qrText, window.location.origin);
+      classroomCode = url.searchParams.get("classroomCode");
 
       if (!classroomCode) {
-        toast.error("Invalid QR Code");
-        setBusy(false);
-        return;
+        const parts = url.pathname.split("/");
+        classroomCode = parts[parts.length - 1] || null;
       }
-
-      // Get location
-      const coords = await getLocation();
-
-      // ------------- CALL CHECK-IN -------------
-      const checkInRes = await callAttendanceApi(
-        "http://localhost:4000/api/attendance/check-in",
-        {
-          teacherId,
-          classroomCode:classroomCode,
-          lat: coords.lat,
-          lng: coords.lng,
-        }
-      );
-      console.log(checkInRes)
-
-      if (checkInRes.success) {
-        setLastAction("checked-in");
-        toast.success("Check-in successful");
-      } else {
-        const msg = (checkInRes.message || "").toLowerCase();
-
-        if (msg.includes("already checked in")) {
-          // -------- TRY CHECK-OUT --------
-          const checkOutRes = await callAttendanceApi(
-            "http://localhost:4000/api/attendance/check-out",
-            {
-              teacherId,
-              classroomCode,
-              lat: coords.lat,
-              lng: coords.lng,
-            }
-          );
-
-          if (checkOutRes.success) {
-            setLastAction("checked-out");
-            toast.success("Check-out successful");
-          } else {
-            toast.error(checkOutRes.message || "Check-out failed");
-          }
-        } else {
-          toast.error(checkInRes.message || "Check-in failed");
-        }
-      }
-    } catch (err: any) {
-      console.error(err);
-      toast.error("Scan error");
-    } finally {
-      setTimeout(() => setBusy(false), 1500);
+    } catch {
+      // qrText is NOT a URL, treat as raw code
+      classroomCode = qrText?.trim() || null;
     }
-  };
+
+    console.log("Extracted classroomCode:", classroomCode);
+
+    if (!classroomCode) {
+      toast.error("Invalid QR Code");
+      setBusy(false);
+      return;
+    }
+
+    const coords = await getLocation();
+
+    const checkInRes = await callAttendanceApi(
+      "http://localhost:4000/api/attendance/check-in",
+      {
+        teacherId,
+        classroomCode,
+        lat: coords.lat,
+        lng: coords.lng,
+      }
+    );
+
+    if (checkInRes.success) {
+      setLastAction("checked-in");
+      toast.success("Check-in successful");
+    } else {
+      const msg = (checkInRes.message || "").toLowerCase();
+
+      if (msg.includes("already checked in")) {
+        const checkOutRes = await callAttendanceApi(
+          "http://localhost:4000/api/attendance/check-out",
+          {
+            teacherId,
+            classroomCode,
+            lat: coords.lat,
+            lng: coords.lng,
+          }
+        );
+
+        if (checkOutRes.success) {
+          setLastAction("checked-out");
+          toast.success("Check-out successful");
+        } else {
+          toast.error(checkOutRes.message || "Check-out failed");
+        }
+      } else {
+        toast.error(checkInRes.message || "Check-in failed");
+      }
+    }
+  } catch (err: any) {
+    console.error(err);
+    toast.error("Scan error");
+  } finally {
+    setTimeout(() => setBusy(false), 1500);
+  }
+};
 
   // ---------- API CALL HELPER ----------
   const callAttendanceApi = async (

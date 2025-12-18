@@ -35,7 +35,7 @@ const Login: React.FC = () => {
     setToken(res.token);
     
 
-    Cookies.set("teacherId", res.user._id, {
+    Cookies.set("teacherId", res.teacher._id, {
     expires: 7,
     sameSite: "strict",
   });
