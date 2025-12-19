@@ -1,39 +1,53 @@
+// QRScannerPage.tsx
 import { useEffect, useRef, useState } from "react";
 import Cookies from "js-cookie";
 import { Html5QrcodeScanner } from "html5-qrcode";
 import { toast } from "react-hot-toast";
+import { useNavigate } from "react-router-dom";
 
 export default function QRScannerPage() {
   const [busy, setBusy] = useState(false);
-  const [lastAction, setLastAction] = useState<"checked-in" | "checked-out" | null>(null);
+  const [lastAction, setLastAction] =
+    useState<"checked-in" | "checked-out" | null>(null);
 
   const scannerRef = useRef<any>(null);
-  const teacherId = Cookies.get("teacherId");
-  console.log(teacherId)
-  const token = Cookies.get("token");
+  const navigate = useNavigate();
 
-  if (!teacherId) {
-    toast.error("Teacher ID missing. Please login again.");
-  }
+  const teacherId = Cookies.get("teacherId") || null;
+  console.log(teacherId)
+  const role = Cookies.get("role") || null;
+  const token = Cookies.get("token") || null;
 
   // ---------- START SCANNER ----------
   useEffect(() => {
-    scannerRef.current = new Html5QrcodeScanner(
+    // Only teachers with valid teacherId and token can use this page
+    if (role !== "teacher" || !teacherId || !token) {
+      toast.error("Only logged-in teachers can use QR scanner");
+      navigate("/dashboard");
+      return;
+    }
+
+    const scanner = new Html5QrcodeScanner(
       "qr-reader",
       { fps: 10, qrbox: 250 },
       false
     );
 
-    scannerRef.current.render(onScanSuccess, () => {});
+    scannerRef.current = scanner;
+    scanner.render(onScanSuccess, () => {});
+
     return () => {
       try {
-        scannerRef.current?.clear();
-      } catch {}
+        scanner.clear();
+      } catch {
+        // ignore
+      }
     };
-  }, []);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [role, teacherId, token, navigate]);
 
   // ---------- SCAN SUCCESS ----------
-const onScanSuccess = async (qrText: string) => {
+ const onScanSuccess = async (qrText: string) => {
   if (busy) return;
   setBusy(true);
 
@@ -42,18 +56,29 @@ const onScanSuccess = async (qrText: string) => {
 
     let classroomCode: string | null = null;
 
+    // 1) Try JSON first: {"classroomCode":"CLASS103"}
     try {
-      // works for full URL or path like /xyz if you give base
-      const url = new URL(qrText, window.location.origin);
-      classroomCode = url.searchParams.get("classroomCode");
-
-      if (!classroomCode) {
-        const parts = url.pathname.split("/");
-        classroomCode = parts[parts.length - 1] || null;
+      const parsed = JSON.parse(qrText);
+      if (parsed && typeof parsed === "object" && parsed.classroomCode) {
+        classroomCode = String(parsed.classroomCode);
       }
     } catch {
-      // qrText is NOT a URL, treat as raw code
-      classroomCode = qrText?.trim() || null;
+      // not JSON, ignore
+    }
+
+    // 2) If still not found, fall back to URL or plain code
+    if (!classroomCode) {
+      try {
+        const url = new URL(qrText, window.location.origin);
+        classroomCode = url.searchParams.get("classroomCode");
+
+        if (!classroomCode) {
+          const parts = url.pathname.split("/");
+          classroomCode = parts[parts.length - 1] || null;
+        }
+      } catch {
+        classroomCode = qrText?.trim() || null;
+      }
     }
 
     console.log("Extracted classroomCode:", classroomCode);
@@ -64,10 +89,17 @@ const onScanSuccess = async (qrText: string) => {
       return;
     }
 
+    if (!teacherId) {
+      toast.error("Teacher ID missing. Please login again.");
+      setBusy(false);
+      return;
+    }
+
     const coords = await getLocation();
+    console.log(coords)
 
     const checkInRes = await callAttendanceApi(
-      "http://localhost:4000/api/attendance/check-in",
+      "http://localhost:4000/api/attendance/check-in", // ensure this matches your Postman URL
       {
         teacherId,
         classroomCode,
@@ -76,45 +108,48 @@ const onScanSuccess = async (qrText: string) => {
       }
     );
 
-    if (checkInRes.success) {
-      setLastAction("checked-in");
-      toast.success("Check-in successful");
-    } else {
-      const msg = (checkInRes.message || "").toLowerCase();
+    // ... rest of your existing logic (same as before)
 
-      if (msg.includes("already checked in")) {
-        const checkOutRes = await callAttendanceApi(
-          "http://localhost:4000/api/attendance/check-out",
-          {
-            teacherId,
-            classroomCode,
-            lat: coords.lat,
-            lng: coords.lng,
-          }
-        );
 
-        if (checkOutRes.success) {
-          setLastAction("checked-out");
-          toast.success("Check-out successful");
-        } else {
-          toast.error(checkOutRes.message || "Check-out failed");
-        }
+      if (checkInRes.success) {
+        setLastAction("checked-in");
+        toast.success("Check-in successful");
       } else {
-        toast.error(checkInRes.message || "Check-in failed");
+        const msg = (checkInRes.message || "").toLowerCase();
+
+        if (msg.includes("already checked in")) {
+          const checkOutRes = await callAttendanceApi(
+            "http://localhost:4000/api/attendance/check-out",
+            {
+              teacherId,
+              classroomCode,
+              lat: coords.lat,
+              lng: coords.lng,
+            }
+          );
+
+          if (checkOutRes.success) {
+            setLastAction("checked-out");
+            toast.success("Check-out successful");
+          } else {
+            toast.error(checkOutRes.message || "Check-out failed");
+          }
+        } else {
+          toast.error(checkInRes.message || "Check-in failed");
+        }
       }
+    } catch (err: any) {
+      console.error(err);
+      toast.error("Scan error");
+    } finally {
+      setTimeout(() => setBusy(false), 1500);
     }
-  } catch (err: any) {
-    console.error(err);
-    toast.error("Scan error");
-  } finally {
-    setTimeout(() => setBusy(false), 1500);
-  }
-};
+  };
 
   // ---------- API CALL HELPER ----------
   const callAttendanceApi = async (
     path: string,
-    body: { teacherId: string | undefined; classroomCode: string; lat: number; lng: number }
+    body: { teacherId: string; classroomCode: string; lat: number; lng: number }
   ): Promise<{ success: boolean; message?: string; data?: any }> => {
     try {
       const res = await fetch(path, {
@@ -142,13 +177,13 @@ const onScanSuccess = async (qrText: string) => {
   const getLocation = (): Promise<{ lat: number; lng: number }> => {
     return new Promise((resolve, reject) => {
       navigator.geolocation.getCurrentPosition(
-        pos => {
+        (pos) => {
           resolve({
             lat: pos.coords.latitude,
             lng: pos.coords.longitude,
           });
         },
-        err => {
+        (err) => {
           toast.error("Location access denied");
           reject(err);
         }

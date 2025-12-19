@@ -4,7 +4,7 @@ import { setToken } from "../utils/auth";
 import Cookies from "js-cookie";
 import { useNavigate } from "react-router-dom";
 import { Eye, EyeOff } from "lucide-react"; // for icons
-import toast from "react-hot-toast";
+import toast, { Toaster } from "react-hot-toast";
 import { getToken } from "../utils/auth"
 
 
@@ -35,10 +35,19 @@ const Login: React.FC = () => {
     setToken(res.token);
     
 
-    Cookies.set("teacherId", res.teacher._id, {
-    expires: 7,
-    sameSite: "strict",
-  });
+  if (res.teacher && res.teacher._id) {
+      Cookies.set("teacherId", res.teacher._id, {
+        expires: 7,
+        sameSite: "strict",
+      });
+    } else {
+      // ensure no stale teacherId from previous login
+      Cookies.remove("teacherId");
+    }
+  Cookies.set("userId",res.user._id,{
+    expires:7,
+    sameSite:"strict"
+  })
     Cookies.set("userName", res.user.name, {
       expires: 7,
       sameSite: "strict",
@@ -52,9 +61,12 @@ const Login: React.FC = () => {
     
     // Navigate based on role
     if (res.user.role === "admin") {
-      navigate("/dashboard");
+    
+         navigate("/dashboard");
+        toast.success(`Welcome to Dashboard ${res.user.name}`)
     } else if (res.user.role === "teacher") {
-      navigate("/dashboard"); // same layout, menus hidden
+      navigate("/dashboard");
+             toast.success(`Welcome to Dashboard ${res.teacher.name}`) // same layout, menus hidden
     }
 
     } catch (err: any) {
@@ -123,6 +135,7 @@ const Login: React.FC = () => {
           </button>
         </form>
       </div>
+      <Toaster/>
     </div>
   );
 };

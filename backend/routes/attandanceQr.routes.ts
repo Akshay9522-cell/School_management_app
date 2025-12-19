@@ -5,7 +5,7 @@ import { attendanceSummary } from "../controllers/Attandance/attendanceSummary.c
 
 const router = Router();
 
-router.get("/summary", auth, attendanceSummary); 
+router.get("/teacher/summary", auth, attendanceSummary); 
 router.post("/check-in", auth, checkInWithQR);
 router.post("/check-out", auth, checkOutWithQR);
 

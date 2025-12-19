@@ -12,6 +12,7 @@ export const getToken = () => Cookies.get("token") || null;
 export const getRole = () => Cookies.get("role") || null;
 export const getUserName = () => Cookies.get("userName") || null;
 export const getTeacherId = () => Cookies.get("teacherId") || null;
+export const getUserId = () => Cookies.get("userId") || null
 
 export const logout = () => {
     Cookies.remove("token");

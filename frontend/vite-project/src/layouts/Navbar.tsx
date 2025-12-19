@@ -3,6 +3,7 @@ import { useNavigate } from "react-router-dom";
 import { FaBars } from "react-icons/fa";
 import { useState } from "react";
 import {  getUserName } from "../utils/auth";
+import toast, { Toaster } from "react-hot-toast";
 
 const Navbar = ({ onToggleSidebar }: { onToggleSidebar: () => void }) => {
   const navigate = useNavigate();
@@ -14,8 +15,11 @@ const Navbar = ({ onToggleSidebar }: { onToggleSidebar: () => void }) => {
     Cookies.remove("token");
     Cookies.remove("role");
 
-    if (role === "admin") navigate("/admin/login");
-    else navigate("/admin/login");
+    if (role === "admin") {
+
+    navigate("/admin/login");
+    toast.success("LogOut successfullu")
+    }else navigate("/admin/login");
   };
 
   return (
@@ -79,7 +83,7 @@ const Navbar = ({ onToggleSidebar }: { onToggleSidebar: () => void }) => {
           </div>
         )}
       </div>
-
+  <Toaster/>
     </div>
   );
 };

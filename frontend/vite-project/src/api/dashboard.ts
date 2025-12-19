@@ -24,4 +24,15 @@ export const getTeacherCount = () => api.get("teachers");
 export const getClassCount = () => api.get("classes/all");
 export const getTodayAttendanceCount = () => api.get("attendance/all");
 
+export const getTodayTeacherAttendanceSummary = (date: string) => {
+  const token = getToken();
+  return api.get(`/attendance/teacher/summary`, {
+    params: { date },
+    headers: {
+      Authorization: `Bearer ${token || ""}`,
+    },
+  });
+};
+
+
 export default api;
