@@ -20,7 +20,7 @@ const DashboardLayout = () => {
       
 
         <main className="p-4 overflow-auto">
-           <Dashboard/> 
+        
           <Outlet />
         </main>
 

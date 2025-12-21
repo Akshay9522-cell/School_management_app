@@ -27,7 +27,7 @@ import qrRoutes from "./routes/qr.routes";
 import studentDailyattendance from './routes/studentAttendance.routes'
 import Bus from "./models/Bus/Bus";
 import parentRoute from './routes/parentRoutes'
-import inventory from "./routes/Inventory/inventory.routes";
+import inventory from './routes/Inventory/inventory.routes'
 import reportRoutes from "./routes/reportcard/reportRoutes";
 import homeworkRoute from "./routes/HomeWork/homeWorkRoutes"
 import testRoutes from "./routes/reportcard/testRoutes"
@@ -69,13 +69,13 @@ app.use(
     credentials: true,
   })
 );
-
+// Connect DB
+connectDB(process.env.MONGO_URI!)
 app.use(express.json());
 
 const PORT = process.env.PORT || 4000;
 
-// Connect DB
- connectDB(process.env.MONGO_URI!)
+
 
 // Routes
 app.use('/api/auth',authRoutes)
@@ -94,7 +94,7 @@ app.use('/api/attendance',attaendance)
 // app.use("/api/fees", feeGenerationRoutes);
 // app.use("/api/fees", feePaymentRoutes);
 //app.use("/api/feesservice", feesService);
-app.use("/api/inventory",inventory)
+
 app.use('/api/classroom/',classRoomRoutes)
 app.use("/api/qr", qrRoutes);
 app.use("/api/attendance",studentDailyattendance)

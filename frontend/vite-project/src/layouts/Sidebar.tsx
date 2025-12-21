@@ -312,23 +312,17 @@ const Sidebar = ({ isOpen }: { isOpen: boolean }) => {
             )}
 
             {/* Inventory Dropdown */}
-            {renderDropdown(
-              "Inventory",
-              <MdInventory2 />,
-              openInventory,
-              setOpenInventory,
-              [
-                { to: "/dashboard/categoryList", label: "Category List" },
-                { to: "/dashboard/itemList", label: "Item List" },
-                { to: "/dashboard/vendorList", label: "Vendor" },
-                { to: "/dashboard/POList", label: "Purchase Order" },
-                { to: "/dashboard/issueList", label: "Issue" },
-                { to: "/dashboard/reports", label: "Reports" },
-                { to: "/dashboard/returnList", label: "return" },
-                { to: "/dashboard/addStock", label: "addStock" },
-                { to: "/dashboard/report-card", label: "ReportCard" },
-              ]
-            )}
+
+             <NavLink
+              to="/dashboard/inventory"
+              className={({ isActive }) => `${baseLink} ${isActive ? activeLink : ""}`}
+            >
+              <span className="flex h-9 w-9 items-center justify-center rounded-xl bg-gradient-to-br from-emerald-500/25 to-emerald-400/10 text-emerald-300 group-hover:text-emerald-200">
+                <FaUsers />
+              </span>
+              {isOpen && <span>Inventory</span>}
+            </NavLink>
+          
           </>
         )}
 
