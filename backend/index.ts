@@ -1,4 +1,5 @@
 import express from "express";
+import cookieParser from "cookie-parser"; 
 import type { Application } from "express";
 import cors from "cors";
 import dotenv from "dotenv";
@@ -6,6 +7,7 @@ import connectDB from "./config/db";
 import { Server as SocketIOServer } from "socket.io";
 import http from "http";
 import { initSocket, simulateBusMovement } from "./lib/socket";
+import { startCleanup } from "./utils/cleanupSeenSos";
 // import connectDB from "./config/db";
 dotenv.config();
 import authRoutes from "./routes/auth";
@@ -33,6 +35,7 @@ import homeworkRoute from "./routes/HomeWork/homeWorkRoutes"
 import testRoutes from "./routes/reportcard/testRoutes"
 import examRoutes from "./routes/examRoutes";
 import seedRoutes from "./routes/seedRoutes";
+import meetingSOSRoutes from "./routes/meeting/meeting.routes";
 
 
 // import busRoutes from "./routes/buses";
@@ -72,6 +75,7 @@ app.use(
 // Connect DB
 connectDB(process.env.MONGO_URI!)
 app.use(express.json());
+app.use(cookieParser());
 
 const PORT = process.env.PORT || 4000;
 
@@ -108,7 +112,7 @@ app.use("/api/homework", homeworkRoute);
 app.use("/api/daily-Report  ",testRoutes)
 app.use("/api/exam", examRoutes);
 app.use("/api/seed", seedRoutes);
-
+app.use("/api/meeting-sos",meetingSOSRoutes);
 // app.use("/api/buses", busRoutes);
 // app.use("/api/inventory", inventoryRoutes);
 
@@ -127,7 +131,9 @@ initSocket(Server);  // <-- This is the ONLY socket init
 startBusSimulations();
 Server.listen(4000, () => {
   console.log("🚀 Server running on port 4000");
+  startCleanup()
 });
+
 
 //app.get("/api/health", (_, res) => res.json({ status: "ok" }));
 

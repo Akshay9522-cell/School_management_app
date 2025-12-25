@@ -37,7 +37,7 @@ const Login: React.FC = () => {
 
   if (res.teacher && res.teacher._id) {
       Cookies.set("teacherId", res.teacher._id, {
-        expires: 7,
+        expires: 7, 
         sameSite: "strict",
       });
     } else {

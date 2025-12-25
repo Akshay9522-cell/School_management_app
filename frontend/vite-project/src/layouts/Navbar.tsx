@@ -18,7 +18,7 @@ const Navbar = ({ onToggleSidebar }: { onToggleSidebar: () => void }) => {
     if (role === "admin") {
 
     navigate("/admin/login");
-    toast.success("LogOut successfullu")
+    toast.success("Logout  successfully")
     }else navigate("/admin/login");
   };
 

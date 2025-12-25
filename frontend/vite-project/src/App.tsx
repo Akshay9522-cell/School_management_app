@@ -37,6 +37,8 @@ import CreateHomework from "./pages/homeWork/CreateHomework";
 import ClassHomeworkList from "./pages/homeWork/ClassHomeworkList";
 import StudentDailyReports from "./pages/students/StudentDailyReport";
 import InventoryPage from "./pages/inventory/InventoryPage";
+import AdminMeetingSOS from "./pages/Meetings/AdminMeetingSOS";
+import TeacherSOSNotifications from "./pages/Meetings/TeacherSOSNotifications";
 
 
 
@@ -101,6 +103,8 @@ function App() {
   <Route path="class-hw" element={<ClassHomeworkList/>}/>
 
   <Route path="sdr" element={<StudentDailyReports/>}/>
+  <Route path="meetings" element={<AdminMeetingSOS/>}/>
+  <Route path="meetnotification" element={<TeacherSOSNotifications/>}/>
   
 
 

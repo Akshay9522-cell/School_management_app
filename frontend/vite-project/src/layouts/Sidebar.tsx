@@ -210,10 +210,7 @@ const Sidebar = ({ isOpen }: { isOpen: boolean }) => {
             <p className="text-[11px] uppercase tracking-[0.18em] text-slate-400">
               Classic Admin Panel
             </p>
-          </div>
-        )}
-
-        {browserSupportsSpeechRecognition && (
+              {browserSupportsSpeechRecognition && (
           <button
             onClick={toggleListening}
             className={`flex items-center justify-center h-9 w-9 rounded-full border text-xs ${
@@ -226,6 +223,10 @@ const Sidebar = ({ isOpen }: { isOpen: boolean }) => {
             {listening ? "🎙" : "🎤"}
           </button>
         )}
+          </div>
+        )}
+
+      
       </div>
 
       {/* Navigation */}
@@ -322,6 +323,15 @@ const Sidebar = ({ isOpen }: { isOpen: boolean }) => {
               </span>
               {isOpen && <span>Inventory</span>}
             </NavLink>
+            <NavLink
+              to="/dashboard/meetings"
+              className={({ isActive }) => `${baseLink} ${isActive ? activeLink : ""}`}
+            >
+              <span className="flex h-9 w-9 items-center justify-center rounded-xl bg-gradient-to-br from-emerald-500/25 to-emerald-400/10 text-emerald-300 group-hover:text-emerald-200">
+                <FaUsers />
+              </span>
+              {isOpen && <span>Emergency meetings</span>}
+            </NavLink>
           
           </>
         )}
@@ -335,15 +345,15 @@ const Sidebar = ({ isOpen }: { isOpen: boolean }) => {
               </p>
             )}
 
-            {/* <NavLink
-              to="/dashboard/ai"
+             <NavLink
+              to="/dashboard/meetnotification"
               className={({ isActive }) => `${baseLink} ${isActive ? activeLink : ""}`}
             >
               <span className="flex h-9 w-9 items-center justify-center rounded-xl bg-gradient-to-br from-fuchsia-500/25 to-pink-500/15 text-fuchsia-300 group-hover:text-fuchsia-200">
                 <FaFileDownload />
               </span>
-              {isOpen && <span>Smart paper Creator</span>}
-            </NavLink> */}
+              {isOpen && <span>Meeting Notification</span>}
+            </NavLink> 
 
             <NavLink
               to="/dashboard/sdr"
